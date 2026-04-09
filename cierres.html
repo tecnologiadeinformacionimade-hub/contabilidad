@@ -140,7 +140,7 @@
 
                 <!-- Archivos Adjuntos -->
                 <div class="mb-6">
-                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Archivos Adjuntos (Soportes)</p>
+                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Archivos Adjuntos</p>
                     <div id="modalAdjuntos" class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm flex flex-col gap-2">
                         <!-- Enlaces inyectados aquí -->
                     </div>
@@ -181,7 +181,7 @@
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
                 <button onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
                 <button onclick="saveItemChanges()" id="btnSave" class="px-4 py-2 text-sm font-medium text-white bg-brand-dark rounded-lg hover:bg-blue-800 transition flex items-center gap-2">
-                    <span id="btnSaveText">Guardar y Notificar</span>
+                    <span id="btnSaveText">Guardar y Envíar</span>
                     <svg id="btnSaveSpinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </button>
             </div>
@@ -280,7 +280,8 @@
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,AttachmentFiles&$expand=Author,AttachmentFiles`;
+                // AGREGADO IMPORTANTÍSIMO: FieldValuesAsText fuerza a SharePoint a enviarnos el texto real, no los IDs
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,AttachmentFiles,FieldValuesAsText/*&$expand=Author,AttachmentFiles,FieldValuesAsText`;
                 
                 const response = await fetch(endpoint, {
                     headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
@@ -312,13 +313,21 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors group';
                 
-                const sucursal = item.Sucursal || item.Title || 'N/A';
-                let usuario = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+                // MÁGIA DE LA API: Accedemos a la representación de texto de todas las columnas.
+                const fv = item.FieldValuesAsText || {};
                 
-                const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
+                // Extraemos la sucursal buscando el texto formateado
+                let sucursal = fv.Sucursal || item.Sucursal || item.OData_Sucursal || item.Title || 'N/A';
+                if (typeof sucursal === 'object' && sucursal !== null) { sucursal = sucursal.Title || sucursal.Label || sucursal.Value || 'N/A'; }
+                
+                // Lo mismo con el usuario
+                let usuario = fv.Usuario_x0020_Declarante || fv.UsuarioDeclarante || item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+                if (typeof usuario === 'object' && usuario !== null) { usuario = usuario.Title || usuario.Label || 'Desconocido'; }
+                
+                const rawFecha = fv.Fecha_x0020_Cierre || item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
                 const fecha = new Date(rawFecha).toLocaleDateString('es-ES');
                 
-                let estadoFiltro = item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
+                let estadoFiltro = fv.Estado || item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
 
                 // Lógica de ícono de adjuntos
                 const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
@@ -350,16 +359,24 @@
             const item = allItemsData.find(i => i.Id === id);
             if(!item) return;
             currentEditingId = id;
+            
+            const fv = item.FieldValuesAsText || {};
 
             // Poblar textos básicos
+            let sucursalStr = fv.Sucursal || item.Sucursal || item.Title || 'N/A';
+            if(typeof sucursalStr === 'object') sucursalStr = sucursalStr.Title || sucursalStr.Label || 'N/A';
+            
+            let usuarioStr = fv.Usuario_x0020_Declarante || item.Usuario_x0020_Declarante || item.Author?.Title || 'Desconocido';
+            if(typeof usuarioStr === 'object') usuarioStr = usuarioStr.Title || usuarioStr.Label || 'Desconocido';
+
             document.getElementById('modalId').innerText = item.Id;
-            document.getElementById('modalSucursal').innerText = item.Sucursal || item.Title || 'N/A';
-            document.getElementById('modalUsuario').innerText = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+            document.getElementById('modalSucursal').innerText = sucursalStr;
+            document.getElementById('modalUsuario').innerText = usuarioStr;
             
             // Poblar Select e Inputs
-            document.getElementById('inputEstado').value = item.Estado || 'En espera';
-            document.getElementById('inputObservaciones').value = item.Observaciones || '';
-            document.getElementById('inputComentarios').value = item.Comentarios || '';
+            document.getElementById('inputEstado').value = item.Estado || fv.Estado || 'En espera';
+            document.getElementById('inputObservaciones').value = fv.Observaciones || item.Observaciones || '';
+            document.getElementById('inputComentarios').value = fv.Comentarios || item.Comentarios || '';
 
             // Poblar Adjuntos
             const adjuntosContainer = document.getElementById('modalAdjuntos');
@@ -408,7 +425,6 @@
                     Comentarios: document.getElementById('inputComentarios').value
                 };
 
-                // Mejoramos los headers para asegurar la compatibilidad con el PATCH de SharePoint
                 const response = await fetch(updateEndpoint, {
                     method: 'PATCH', 
                     headers: {
@@ -437,12 +453,11 @@
 
             } catch(error) {
                 console.error("Error guardando:", error);
-                // La alerta ahora mostrará exactamente por qué SharePoint está rechazando el guardado
                 alert(`Hubo un error al guardar los cambios en SharePoint.\n\nDetalle técnico:\n${error.message}\n\nSolución: Si el error dice "Access Denied", asegúrate de haber dado el permiso "AllSites.Write" en Entra ID.`);
             } finally {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
-                btnText.innerText = "Guardar y Notificar";
+                btnText.innerText = "Guardar y Envíar";
             }
         }
 
