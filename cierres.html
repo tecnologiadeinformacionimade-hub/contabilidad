@@ -50,7 +50,7 @@
         </div>
     </nav>
 
-    <!-- Pantalla de Carga de Autenticación Silenciosa (SSO) -->
+    <!-- Pantalla de Carga de Autenticación -->
     <div id="authLoadingScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
         <svg class="animate-spin h-12 w-12 text-brand-dark mb-4 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <h2 class="text-xl font-bold text-gray-900 mb-2">Verificando credenciales...</h2>
@@ -71,9 +71,7 @@
             </button>
         </div>
 
-        <!-- Controles y Tabla -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            
             <div class="border-b border-gray-200 px-4 py-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50">
                 <div class="flex space-x-1 bg-gray-200/50 p-1 rounded-lg self-start">
                     <button onclick="changeList('CIERRES', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md bg-white text-brand-dark shadow-sm transition-all">En Espera</button>
@@ -83,7 +81,6 @@
             </div>
 
             <div class="overflow-x-auto custom-scrollbar relative min-h-[300px]">
-                <!-- Spinner de carga de tabla -->
                 <div id="loadingSpinner" class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 hidden">
                     <svg class="animate-spin h-8 w-8 text-brand-light mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span class="text-sm font-medium text-gray-600">Obteniendo datos de SharePoint...</span>
@@ -112,8 +109,6 @@
     <!-- MODAL DE EDICIÓN Y DETALLE -->
     <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden modal-enter flex flex-col max-h-[90vh]">
-            
-            <!-- Cabecera del Modal -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <svg class="text-brand-light" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -124,9 +119,7 @@
                 </button>
             </div>
 
-            <!-- Cuerpo del Modal (Scrollable) -->
             <div class="px-6 py-4 overflow-y-auto custom-scrollbar flex-1">
-                
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <p class="text-xs font-semibold text-gray-500 uppercase">Sucursal</p>
@@ -138,17 +131,14 @@
                     </div>
                 </div>
 
-                <!-- Archivos Adjuntos -->
                 <div class="mb-6">
                     <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Archivos Adjuntos</p>
                     <div id="modalAdjuntos" class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm flex flex-col gap-2">
-                        <!-- Enlaces inyectados aquí -->
                     </div>
                 </div>
 
                 <hr class="border-gray-200 my-4">
 
-                <!-- Formulario de Edición -->
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado del Cierre</label>
@@ -158,26 +148,17 @@
                             <option value="Rechazado">Rechazado</option>
                         </select>
                     </div>
-                    
-                    <!-- Campo Observaciones: Ahora es Solo Lectura (Readonly) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Observaciones <span class="text-xs font-normal text-gray-500">(Mensaje original del usuario declarante)</span>
-                        </label>
-                        <textarea id="inputObservaciones" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed outline-none" readonly placeholder="El usuario no dejó observaciones..."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones <span class="text-xs font-normal text-gray-500">(Mensaje original del usuario)</span></label>
+                        <textarea id="inputObservaciones" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed outline-none" readonly></textarea>
                     </div>
-
-                    <!-- Campo Comentarios: Aclarado su propósito -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Comentarios de Resolución <span class="text-xs font-normal text-brand-light">(Se enviará por correo al usuario)</span>
-                        </label>
-                        <textarea id="inputComentarios" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe aquí el motivo del rechazo o notas de finalización para notificar al usuario..."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Comentarios de Resolución <span class="text-xs font-normal text-brand-light">(Se enviará por correo)</span></label>
+                        <textarea id="inputComentarios" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe el motivo del cambio de estado..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Pie del Modal -->
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
                 <button onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
                 <button onclick="saveItemChanges()" id="btnSave" class="px-4 py-2 text-sm font-medium text-white bg-brand-dark rounded-lg hover:bg-blue-800 transition flex items-center gap-2">
@@ -190,9 +171,7 @@
 
     <!-- LÓGICA DE API Y AUTENTICACIÓN -->
     <script>
-        // ==========================================
-        // CONFIGURACIÓN PARA IT 
-        // ==========================================
+        // CONFIGURACIÓN IT
         const msalConfig = {
             auth: {
                 clientId: "4d1a060b-c2b6-4214-8bb5-c2639e627b74", 
@@ -201,17 +180,40 @@
             },
             cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
         };
-
         const siteUrl = "https://grupoimade.sharepoint.com/sites/CONTABILIDAD_IMADE";
         const tokenRequest = { scopes: ["https://grupoimade.sharepoint.com/.default"] };
-        // ==========================================
 
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentList = 'CIERRES';
-        let allItemsData = []; // Guardará los datos cargados para usarlos en el modal
+        let allItemsData = [];
         let currentEditingId = null;
 
-        // LÓGICA DE INICIO DE SESIÓN TRANSPARENTE (SSO)
+        /**
+         * Función IT: Esta función busca el valor de Sucursal probando todos los nombres internos posibles
+         * que genera SharePoint para columnas personalizadas.
+         */
+        function findSucursalValue(item) {
+            // Probamos nombres comunes
+            const keysToTry = ['Sucursal', 'OData__Sucursal', 'SucursalId', 'Sucursal0'];
+            for (let key of keysToTry) {
+                if (item[key] !== undefined && item[key] !== null) {
+                    const val = item[key];
+                    if (typeof val === 'object') return val.Title || val.Label || val.Value || JSON.stringify(val);
+                    return String(val);
+                }
+            }
+            
+            // Si no lo encuentra por nombre exacto, busca cualquier propiedad que CONTENGA "Sucursal"
+            const wildcardKey = Object.keys(item).find(k => k.includes('Sucursal') && !k.includes('@'));
+            if (wildcardKey) {
+                const val = item[wildcardKey];
+                if (typeof val === 'object') return val.Title || val.Label || val.Value || 'N/A';
+                return String(val);
+            }
+            
+            return item.Title || 'N/A'; // Respaldo final
+        }
+
         async function initializeAuth() {
             try {
                 const response = await msalInstance.handleRedirectPromise();
@@ -233,10 +235,7 @@
             }
         }
 
-        function signOut() { 
-            sessionStorage.clear(); 
-            msalInstance.logoutRedirect(); 
-        }
+        function signOut() { sessionStorage.clear(); msalInstance.logoutRedirect(); }
 
         function handleUIUpdate(account) {
             if (account) {
@@ -259,7 +258,6 @@
             loadSharePointData();
         }
 
-        // Función para renderizar el badge de estado
         function getStatusBadge(estadoStr) {
             const estado = estadoStr || '';
             if(estado.toLowerCase().includes('finalizado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
@@ -268,23 +266,6 @@
             return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-500 text-white">${estado || 'N/A'}</span>`;
         }
 
-        /**
-         * Función utilitaria para extraer el texto legible de un campo de SharePoint,
-         * manejando si es un texto simple, un lookup (objeto), una opción, etc.
-         */
-        function getFieldText(item, fieldName) {
-            const val = item[fieldName];
-            if (val === null || val === undefined) return '';
-            
-            // Si es un objeto (como un Lookup o un campo de Persona)
-            if (typeof val === 'object') {
-                return val.Title || val.Label || val.Value || JSON.stringify(val);
-            }
-            
-            return String(val);
-        }
-
-        // FETCH API: Descargar datos de SharePoint
         async function loadSharePointData() {
             const accounts = msalInstance.getAllAccounts();
             if (accounts.length === 0) return;
@@ -296,24 +277,17 @@
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                /**
-                 * REFACTORIZACIÓN API:
-                 * Eliminamos FieldValuesAsText que causaba el Error 400 (Unknown Error).
-                 * En su lugar, intentamos expandir específicamente los campos que sabemos que son Lookups (como Sucursal).
-                 * Agregamos soporte para campos de persona/autor.
-                 */
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,Sucursal/Title&$expand=Author,AttachmentFiles,Sucursal`;
+                // CORRECCIÓN: Quitamos 'Sucursal' de expand/select para evitar el error 400.
+                // SharePoint traerá el campo automáticamente en el '*' si existe como columna simple o ID.
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title&$expand=Author,AttachmentFiles`;
                 
                 const response = await fetch(endpoint, {
-                    headers: { 
-                        "Authorization": `Bearer ${tokenResponse.accessToken}`, 
-                        "Accept": "application/json;odata=nometadata" 
-                    }
+                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(`SharePoint respondió con error: ${errorText}`);
+                    throw new Error(`Error ${response.status}: ${errorText}`);
                 }
                 
                 const data = await response.json();
@@ -328,11 +302,10 @@
             }
         }
 
-        // Renderizar datos en el HTML
         function renderTable(items) {
             const tbody = document.getElementById('tableBody');
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay registros disponibles en esta vista.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay registros en esta vista.</td></tr>`;
                 return;
             }
 
@@ -340,23 +313,20 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors group border-b border-gray-100';
                 
-                // Extracción de datos inteligente
-                // Sucursal: si expandimos Sucursal, el texto está en Sucursal.Title. Si no, mostramos el ID o Title como respaldo.
-                let sucursal = getFieldText(item, 'Sucursal') || item.Title || 'N/A';
+                // Usamos el buscador inteligente para la sucursal
+                let sucursal = findSucursalValue(item);
                 
-                // Usuario Declarante: Buscamos en varios campos posibles
-                let usuario = getFieldText(item, 'Usuario_x0020_Declarante') || getFieldText(item, 'UsuarioDeclarante') || item.Author?.Title || 'Desconocido';
+                // Buscamos usuario declarante
+                let usuario = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
                 
-                // Fecha: Priorizamos Fecha Cierre, luego la creación
                 const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
                 const fecha = rawFecha ? new Date(rawFecha).toLocaleDateString('es-ES') : 'N/A';
                 
-                // Estado: Lógica de pestaña si el campo viene vacío
                 let estadoFiltro = item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
 
                 const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
                 const adjuntosHtml = tieneAdjuntos 
-                    ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs" title="${item.AttachmentFiles.length} archivos"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
+                    ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
                     : `<span class="text-gray-300">-</span>`;
                 
                 tr.innerHTML = `
@@ -376,20 +346,14 @@
             });
         }
 
-        // ==========================================
-        // LÓGICA DEL MODAL Y ACTUALIZACIÓN (PATCH)
-        // ==========================================
         function openModal(id) {
             const item = allItemsData.find(i => i.Id === id);
             if(!item) return;
             currentEditingId = id;
             
-            const sucursalStr = getFieldText(item, 'Sucursal') || item.Title || 'N/A';
-            const usuarioStr = getFieldText(item, 'Usuario_x0020_Declarante') || getFieldText(item, 'UsuarioDeclarante') || item.Author?.Title || 'Desconocido';
-
             document.getElementById('modalId').innerText = item.Id;
-            document.getElementById('modalSucursal').innerText = sucursalStr;
-            document.getElementById('modalUsuario').innerText = usuarioStr;
+            document.getElementById('modalSucursal').innerText = findSucursalValue(item);
+            document.getElementById('modalUsuario').innerText = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
             
             document.getElementById('inputEstado').value = item.Estado || 'En espera';
             document.getElementById('inputObservaciones').value = item.Observaciones || '';
@@ -407,7 +371,7 @@
                     adjuntosContainer.appendChild(link);
                 });
             } else {
-                adjuntosContainer.innerHTML = '<span class="text-gray-400 italic">No hay archivos adjuntos en este cierre.</span>';
+                adjuntosContainer.innerHTML = '<span class="text-gray-400 italic">No hay archivos adjuntos.</span>';
             }
 
             document.getElementById('editModal').classList.remove('hidden');
@@ -453,14 +417,8 @@
                 });
 
                 if (!response.ok) {
-                    let errorMsg = "Error desconocido de SharePoint";
-                    try {
-                        const errData = await response.json();
-                        errorMsg = errData.error?.message?.value || errData.error?.message || JSON.stringify(errData);
-                    } catch(e) {
-                        errorMsg = await response.text();
-                    }
-                    throw new Error(errorMsg);
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message?.value || "Error al actualizar");
                 }
 
                 closeModal();
@@ -468,7 +426,7 @@
 
             } catch(error) {
                 console.error("Error guardando:", error);
-                alert(`Hubo un error al guardar los cambios en SharePoint.\n\nDetalle técnico:\n${error.message}\n\nSolución: Si el error dice "Access Denied", asegúrate de haber dado el permiso "AllSites.Manage" (Escritura) en Entra ID y concedido el consentimiento.`);
+                alert(`Error al guardar en SharePoint:\n${error.message}`);
             } finally {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
