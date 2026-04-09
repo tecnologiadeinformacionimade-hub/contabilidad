@@ -40,24 +40,21 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span id="userNameDisplay" class="text-sm font-medium text-gray-700 hidden"></span>
-                    <button id="loginButton" onclick="signIn()" class="bg-brand-dark text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-800 transition">Iniciar Sesión</button>
+                    <!-- Botones de sesión ocultos por defecto, solo se muestran si hay un error o se desea salir manualmente -->
                     <button id="logoutButton" onclick="signOut()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition">Salir</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Pantalla de Bienvenida (Antes de login) -->
-    <div id="welcomeScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 max-w-md w-full">
-            <svg class="mx-auto h-12 w-12 text-brand-light mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Acceso a Cierres</h2>
-            <p class="text-gray-500 mb-6">Inicia sesión con tu cuenta de Grupo Imade para cargar los datos desde SharePoint.</p>
-            <button onclick="signIn()" class="w-full bg-brand-dark text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-800 transition shadow-md">Conectar con Microsoft 365</button>
-        </div>
+    <!-- Pantalla de Carga de Autenticación Silenciosa (SSO) -->
+    <div id="authLoadingScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
+        <svg class="animate-spin h-12 w-12 text-brand-dark mb-4 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Verificando credenciales...</h2>
+        <p class="text-gray-500">Conectando de forma segura con Grupo Imade.</p>
     </div>
 
-    <!-- Contenido Principal (Después de login) -->
+    <!-- Contenido Principal (Se muestra automáticamente al autenticar) -->
     <main id="dashboardScreen" class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden fade-in">
         
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
@@ -76,7 +73,6 @@
             
             <div class="border-b border-gray-200 px-4 py-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50">
                 <div class="flex space-x-1 bg-gray-200/50 p-1 rounded-lg self-start">
-                    <!-- Los botones llaman a la API con el nombre de la lista correspondiente -->
                     <button onclick="changeList('CIERRES', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md bg-white text-brand-dark shadow-sm transition-all">En Espera</button>
                     <button onclick="changeList('Cierres Finalizados', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Finalizados</button>
                     <button onclick="changeList('Cierres Rechazados', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Rechazados</button>
@@ -85,7 +81,7 @@
 
             <div class="overflow-x-auto custom-scrollbar relative min-h-[300px]">
                 
-                <!-- Spinner de carga -->
+                <!-- Spinner de carga de tabla -->
                 <div id="loadingSpinner" class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 hidden">
                     <svg class="animate-spin h-8 w-8 text-brand-light mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span class="text-sm font-medium text-gray-600">Obteniendo datos de SharePoint...</span>
@@ -101,7 +97,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="bg-white divide-y divide-gray-200 fade-in">
-                        <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Selecciona una lista para cargar los datos.</td></tr>
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -116,12 +112,19 @@
         const msalConfig = {
             auth: {
                 // 1. Ve a entra.microsoft.com -> Registros de aplicaciones -> Nuevo registro.
-                // 2. En "URI de redirección", pon "Aplicación de página única (SPA)" y la URL donde esté alojado este HTML (ej. http://localhost o tu servidor).
+                // 2. En "URI de redirección", pon "Aplicación de página única (SPA)" y la URL exacta donde esté alojado este HTML.
                 // 3. Copia el ID de la aplicación (cliente) y pégalo aquí:
-                clientId: "INGRESA_AQUI_TU_CLIENT_ID", 
+                clientId: "4d1a060b-c2b6-4214-8bb5-c2639e627b74", 
                 
                 // 4. Copia el ID del directorio (inquilino/tenant) y reemplaza la palabra "INGRESA_AQUI_TU_TENANT_ID":
-                authority: "https://login.microsoftonline.com/INGRESA_AQUI_TU_TENANT_ID"
+                authority: "https://login.microsoftonline.com/f22a53bd-afee-40ff-ad90-859eb01980fb",
+                
+                // Redirigir de vuelta a esta misma página después de autenticar silenciosamente
+                redirectUri: window.location.href 
+            },
+            cache: {
+                cacheLocation: "sessionStorage", // Recomendado para evitar pedir login en cada recarga
+                storeAuthStateInCookie: false,
             }
         };
 
@@ -136,50 +139,53 @@
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentList = 'CIERRES';
 
-        // Función de inicio de sesión
-        async function signIn() {
+        // LÓGICA DE INICIO DE SESIÓN TRANSPARENTE (SSO)
+        async function initializeAuth() {
             try {
-                const loginResponse = await msalInstance.loginPopup(tokenRequest);
-                handleUIUpdate(loginResponse.account);
-                loadSharePointData();
-            } catch (error) {
-                console.error("Error en login:", error);
-                if(error.message.includes("ClientAuthError")) {
-                    alert("Asegúrate de haber configurado el ClientId y TenantId en el código HTML.");
+                // Manejar la respuesta si venimos de un redireccionamiento de Microsoft
+                const response = await msalInstance.handleRedirectPromise();
+                
+                if (response !== null) {
+                    // Si acabamos de ser redirigidos exitosamente, cargamos UI
+                    handleUIUpdate(response.account);
+                    loadSharePointData();
+                } else {
+                    // Si apenas entramos a la página, revisamos si ya hay cuentas guardadas
+                    const currentAccounts = msalInstance.getAllAccounts();
+                    
+                    if (currentAccounts.length === 0) {
+                        // NO hay sesión. Redirigimos AUTOMÁTICAMENTE al login de Microsoft sin preguntar.
+                        // (Si el usuario ya tiene sesión en su Windows/Navegador, esto pasará súper rápido).
+                        msalInstance.loginRedirect(tokenRequest);
+                    } else {
+                        // YA hay sesión activa guardada. Pasamos directo.
+                        handleUIUpdate(currentAccounts[0]);
+                        loadSharePointData();
+                    }
                 }
+            } catch (error) {
+                console.error("Error en la autenticación silenciosa:", error);
+                document.getElementById('authLoadingScreen').innerHTML = `
+                    <div class="text-red-500 mb-4"><svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <h2 class="text-xl font-bold text-gray-900">Error de Autenticación</h2>
+                    <p class="text-gray-500 mt-2">Asegúrate de que el Client ID y Tenant ID estén configurados en el código.</p>
+                `;
             }
         }
 
-        // Función de cierre de sesión
+        // Función de cierre de sesión manual
         function signOut() {
-            msalInstance.logoutPopup();
-            handleUIUpdate(null);
+            msalInstance.logoutRedirect();
         }
 
-        // Verifica si ya hay sesión activa al recargar la página
-        msalInstance.handleRedirectPromise().then(() => {
-            const accounts = msalInstance.getAllAccounts();
-            if (accounts.length > 0) {
-                handleUIUpdate(accounts[0]);
-                loadSharePointData();
-            }
-        });
-
-        // Actualiza la interfaz dependiendo si hay usuario logueado
+        // Actualiza la interfaz ocultando el loader y mostrando el dashboard
         function handleUIUpdate(account) {
             if (account) {
-                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('authLoadingScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                document.getElementById('loginButton').classList.add('hidden');
                 document.getElementById('logoutButton').classList.remove('hidden');
                 document.getElementById('userNameDisplay').classList.remove('hidden');
                 document.getElementById('userNameDisplay').innerText = "Hola, " + account.name;
-            } else {
-                document.getElementById('welcomeScreen').classList.remove('hidden');
-                document.getElementById('dashboardScreen').classList.add('hidden');
-                document.getElementById('loginButton').classList.remove('hidden');
-                document.getElementById('logoutButton').classList.add('hidden');
-                document.getElementById('userNameDisplay').classList.add('hidden');
             }
         }
 
@@ -208,13 +214,13 @@
             tbody.innerHTML = '';
 
             try {
-                // Obtener token silenciosamente
+                // Obtener token de acceso
                 const tokenResponse = await msalInstance.acquireTokenSilent({
                     ...tokenRequest,
                     account: accounts[0]
                 });
 
-                // Llamada REST a la lista de SharePoint seleccionada (Añadí $expand para traer el nombre del autor)
+                // Llamada REST a la lista de SharePoint seleccionada
                 const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$select=Id,Title,Created,Author/Title&$expand=Author`;
                 
                 const response = await fetch(endpoint, {
@@ -247,11 +253,9 @@
             }
 
             items.forEach(item => {
-                // IT: Aquí puedes agregar las columnas internas personalizadas de tu lista SharePoint (ej. item.Sucursal, item.Observaciones)
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors';
                 
-                // Formatear fecha
                 const fecha = new Date(item.Created).toLocaleDateString('es-ES');
                 
                 tr.innerHTML = `
@@ -268,6 +272,10 @@
                 tbody.appendChild(tr);
             });
         }
+
+        // Iniciar el flujo de autenticación apenas cargue la página
+        window.onload = initializeAuth;
+
     </script>
 </body>
 </html>
