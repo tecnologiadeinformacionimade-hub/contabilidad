@@ -227,7 +227,10 @@
             }
         }
 
-        function signOut() { msalInstance.logoutRedirect(); }
+        function signOut() { 
+            sessionStorage.clear(); // Limpiamos caché por si los permisos se quedaron pegados
+            msalInstance.logoutRedirect(); 
+        }
 
         function handleUIUpdate(account) {
             if (account) {
@@ -271,7 +274,6 @@
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                // CORRECCIÓN MAGNA: $top=5000 para traer todos. Expandimos AttachmentFiles para ver adjuntos.
                 const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,AttachmentFiles&$expand=Author,AttachmentFiles`;
                 
                 const response = await fetch(endpoint, {
@@ -359,7 +361,6 @@
             if(item.AttachmentFiles && item.AttachmentFiles.length > 0) {
                 item.AttachmentFiles.forEach(file => {
                     const link = document.createElement('a');
-                    // El ServerRelativeUrl nos sirve para abrir el archivo
                     link.href = `https://grupoimade.sharepoint.com${file.ServerRelativeUrl}`;
                     link.target = '_blank';
                     link.className = "flex items-center gap-2 text-brand-dark hover:underline p-2 rounded hover:bg-gray-200 transition";
@@ -370,7 +371,6 @@
                 adjuntosContainer.innerHTML = '<span class="text-gray-400 italic">No hay archivos adjuntos en este cierre.</span>';
             }
 
-            // Mostrar Modal
             document.getElementById('editModal').classList.remove('hidden');
         }
 
@@ -396,34 +396,43 @@
                 
                 const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items(${currentEditingId})`;
                 
-                // Extraemos valores del modal
                 const payload = {
                     Estado: document.getElementById('inputEstado').value,
                     Observaciones: document.getElementById('inputObservaciones').value,
                     Comentarios: document.getElementById('inputComentarios').value
                 };
 
+                // Mejoramos los headers para asegurar la compatibilidad con el PATCH de SharePoint
                 const response = await fetch(updateEndpoint, {
-                    method: 'PATCH', // PATCH o POST con X-HTTP-Method=MERGE es lo requerido por SharePoint
+                    method: 'PATCH', 
                     headers: {
                         "Authorization": `Bearer ${tokenResponse.accessToken}`,
-                        "Accept": "application/json;odata=nometadata",
-                        "Content-Type": "application/json;odata=nometadata",
-                        "IF-MATCH": "*", // Sobrescribir sin importar la versión
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "IF-MATCH": "*", 
                         "X-HTTP-Method": "MERGE"
                     },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) throw new Error("Fallo al actualizar el item");
+                if (!response.ok) {
+                    let errorMsg = "Error desconocido de SharePoint";
+                    try {
+                        const errData = await response.json();
+                        errorMsg = errData.error?.message?.value || errData.error?.message || JSON.stringify(errData);
+                    } catch(e) {
+                        errorMsg = await response.text();
+                    }
+                    throw new Error(errorMsg);
+                }
 
-                // Éxito: Cerrar modal y recargar
                 closeModal();
                 loadSharePointData();
 
             } catch(error) {
                 console.error("Error guardando:", error);
-                alert("Hubo un error al guardar los cambios. Verifica tus permisos de edición en la lista de SharePoint.");
+                // La alerta ahora mostrará exactamente por qué SharePoint está rechazando el guardado
+                alert(`Hubo un error al guardar los cambios en SharePoint.\n\nDetalle técnico:\n${error.message}\n\nSolución: Si el error dice "Access Denied", asegúrate de haber dado el permiso "AllSites.Write" en Entra ID.`);
             } finally {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
