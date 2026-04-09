@@ -44,7 +44,11 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span id="userNameDisplay" class="text-sm font-medium text-gray-700 hidden"></span>
-                    <button id="logoutButton" onclick="signOut()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition">Salir</button>
+                    
+                    <!-- Botón de Configuración que reemplaza al de Salir -->
+                    <button id="settingsButton" onclick="openSettingsModal()" class="hidden text-gray-500 hover:text-brand-dark hover:bg-gray-100 p-2 rounded-lg transition-colors" title="Configuración">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -169,6 +173,45 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONFIGURACIÓN -->
+    <div id="settingsModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden modal-enter flex flex-col">
+            <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="text-brand-dark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Configuración
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <div class="px-5 py-6">
+                <p class="text-sm text-gray-500 mb-6 text-center">Gestiona tu sesión conectada al Tenant de Microsoft 365.</p>
+                
+                <button onclick="openLogoutConfirmModal()" class="w-full flex items-center justify-between px-4 py-3 border border-red-200 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition shadow-sm">
+                    <span class="font-medium text-sm">Salir de Tenant Microsoft</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN -->
+    <div id="logoutConfirmModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-[120] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden modal-enter text-center p-6">
+            <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+                <svg class="text-orange-500" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">¿Estás completamente seguro?</h3>
+            <p class="text-sm text-gray-500 mb-6">Al cerrar la sesión de tu cuenta de Microsoft, perderás el acceso a este panel ya que <b>tus credenciales están enlazadas a los permisos de los cierres</b>. Tendrás que volver a iniciar sesión para continuar operando.</p>
+            <div class="flex flex-col gap-3">
+                <button onclick="signOut()" class="w-full px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Sí, cerrar sesión</button>
+                <button onclick="closeLogoutConfirmModal()" class="w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar y volver</button>
+            </div>
+        </div>
+    </div>
+
     <!-- LÓGICA DE API Y AUTENTICACIÓN -->
     <script>
         // CONFIGURACIÓN IT
@@ -209,13 +252,34 @@
             }
         }
 
-        function signOut() { sessionStorage.clear(); msalInstance.logoutRedirect(); }
+        // Modales de configuración y cierre de sesión
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function openLogoutConfirmModal() {
+            closeSettingsModal(); // Cerramos la configuración primero
+            document.getElementById('logoutConfirmModal').classList.remove('hidden');
+        }
+
+        function closeLogoutConfirmModal() {
+            document.getElementById('logoutConfirmModal').classList.add('hidden');
+        }
+
+        function signOut() { 
+            sessionStorage.clear(); 
+            msalInstance.logoutRedirect(); 
+        }
 
         function handleUIUpdate(account) {
             if (account) {
                 document.getElementById('authLoadingScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                document.getElementById('logoutButton').classList.remove('hidden');
+                document.getElementById('settingsButton').classList.remove('hidden');
                 document.getElementById('userNameDisplay').classList.remove('hidden');
                 document.getElementById('userNameDisplay').innerText = "Hola, " + account.name;
             }
