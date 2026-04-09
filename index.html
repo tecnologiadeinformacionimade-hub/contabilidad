@@ -35,15 +35,6 @@
         /* Ocultar barra de desplazamiento pero permitir scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .erp-card {
-            transition: all 0.2s ease-in-out;
-        }
-        .erp-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-            border-color: #cbd5e1;
-        }
     </style>
 </head>
 <body class="bg-brand-bg text-slate-800 font-sans h-screen flex overflow-hidden antialiased">
@@ -78,25 +69,7 @@
                 <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                 Creación de Códigos
             </a>
-
-            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">Soporte</p>
-            
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg group font-medium text-sm transition-colors">
-                <svg class="w-5 h-5 text-slate-400 group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                Mesa de Ayuda IT
-            </a>
         </nav>
-
-        <!-- Footer Sidebar -->
-        <div class="p-4 bg-slate-900 border-t border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-white font-bold text-sm">IT</div>
-                <div>
-                    <p class="text-sm font-medium text-white">Dpto. Sistemas</p>
-                    <p class="text-xs text-slate-400">Administrador</p>
-                </div>
-            </div>
-        </div>
     </aside>
 
     <!-- Overlay oscuro para móvil al abrir sidebar -->
@@ -117,21 +90,6 @@
                     <span class="text-brand-primary font-semibold">Dashboard Principal</span>
                 </div>
             </div>
-
-            <!-- Acciones Topbar -->
-            <div class="flex items-center gap-4">
-                <!-- Buscador (Visual) -->
-                <div class="hidden lg:block relative">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="Buscar módulo..." class="pl-9 pr-4 py-1.5 bg-slate-100 border-transparent rounded-lg text-sm focus:bg-white focus:border-brand-light focus:ring-2 focus:ring-brand-light/20 outline-none w-64 transition-all">
-                </div>
-
-                <!-- Notificaciones -->
-                <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-            </div>
         </header>
 
         <!-- CONTENIDO DEL DASHBOARD -->
@@ -141,94 +99,10 @@
                 <!-- Encabezado de la página -->
                 <div class="mb-8">
                     <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Centro de Operaciones</h1>
-                    <p class="text-sm text-slate-500 mt-1">Gestión centralizada del sistema ERP. Selecciona un módulo para comenzar.</p>
+                    <p class="text-sm text-slate-500 mt-1">Gestión centralizada del sistema ERP. Selecciona un módulo en el menú lateral para comenzar.</p>
                 </div>
 
-                <!-- WIDGETS DE RESUMEN (Datos simulados para el look ERP) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase">Estado Sistema</p>
-                            <p class="text-xl font-bold text-green-600 mt-1 flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Óptimo
-                            </p>
-                        </div>
-                        <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase">Cierres Activos</p>
-                            <p class="text-xl font-bold text-slate-800 mt-1">Conectado</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-brand-primary">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Título Sección Módulos -->
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    Módulos Disponibles
-                </h2>
-
-                <!-- GRID DE MÓDULOS PRINCIPALES -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- MÓDULO: CIERRES -->
-                    <div onclick="window.location.href='cierres.html'" class="erp-card bg-white border border-slate-200 rounded-xl p-6 cursor-pointer flex flex-col group relative overflow-hidden">
-                        <!-- Decoración superior color -->
-                        <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-primary"></div>
-                        
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-12 h-12 rounded-lg bg-brand-primary/10 flex items-center justify-center group-hover:bg-brand-primary transition-colors">
-                                <svg class="w-6 h-6 text-brand-primary group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Operativo
-                            </span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-brand-primary transition-colors">Módulo de Cierres</h3>
-                        <p class="text-sm text-slate-500 mb-6 flex-grow">Conexión directa con SharePoint para revisar, aprobar o rechazar los cierres de las sucursales.</p>
-                        
-                        <div class="flex items-center text-sm font-medium text-brand-light mt-auto">
-                            Ingresar al sistema
-                            <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- MÓDULO: CREACIÓN DE CÓDIGO -->
-                    <div onclick="window.location.href='codigo.html'" class="erp-card bg-white border border-slate-200 rounded-xl p-6 cursor-pointer flex flex-col group relative overflow-hidden">
-                        <!-- Decoración superior color -->
-                        <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-light"></div>
-                        
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-12 h-12 rounded-lg bg-brand-light/10 flex items-center justify-center group-hover:bg-brand-light transition-colors">
-                                <svg class="w-6 h-6 text-brand-light group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Operativo
-                            </span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-brand-light transition-colors">Creación de Códigos</h3>
-                        <p class="text-sm text-slate-500 mb-6 flex-grow">Herramienta interna del departamento de IT para la generación y gestión de códigos estructurados.</p>
-                        
-                        <div class="flex items-center text-sm font-medium text-brand-light mt-auto">
-                            Ingresar al sistema
-                            <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </div>
-                    </div>
-
-                </div>
+                <!-- Espacio en blanco a petición -->
                 
                 <div class="mt-12 pt-6 border-t border-slate-200 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500">
                     <p>&copy; <script>document.write(new Date().getFullYear())</script> Grupo Imade. Todos los derechos reservados.</p>
