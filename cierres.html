@@ -217,8 +217,8 @@
                     account: accounts[0]
                 });
 
-                // Cambiamos la petición: Eliminamos $select para que SharePoint nos devuelva TODAS las columnas personalizadas.
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$expand=Author`;
+                // CORRECCIÓN: Agregamos $select=* para pedir todas las columnas mientras expandimos Author.
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$select=*,Author/Title&$expand=Author`;
                 
                 const response = await fetch(endpoint, {
                     headers: {
