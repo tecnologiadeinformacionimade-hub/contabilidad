@@ -90,14 +90,16 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Título / Sucursal</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha Creación</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Creado por</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha Cierre</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sucursal</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuario Declarante</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Observaciones</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="bg-white divide-y divide-gray-200 fade-in">
-                        <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Cargando...</td></tr>
+                        <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -107,30 +109,22 @@
     <!-- LÓGICA DE API Y AUTENTICACIÓN -->
     <script>
         // ==========================================
-        // CONFIGURACIÓN PARA IT (¡IMPORTANTE LLENAR ESTO!)
+        // CONFIGURACIÓN PARA IT 
         // ==========================================
         const msalConfig = {
             auth: {
-                // 1. Ve a entra.microsoft.com -> Registros de aplicaciones -> Nuevo registro.
-                // 2. En "URI de redirección", pon "Aplicación de página única (SPA)" y la URL exacta donde esté alojado este HTML.
-                // 3. Copia el ID de la aplicación (cliente) y pégalo aquí:
                 clientId: "4d1a060b-c2b6-4214-8bb5-c2639e627b74", 
-                
-                // 4. Copia el ID del directorio (inquilino/tenant) y reemplaza la palabra "INGRESA_AQUI_TU_TENANT_ID":
                 authority: "https://login.microsoftonline.com/f22a53bd-afee-40ff-ad90-859eb01980fb",
-                
-                // Redirigir de vuelta a esta misma página después de autenticar silenciosamente
                 redirectUri: window.location.href 
             },
             cache: {
-                cacheLocation: "sessionStorage", // Recomendado para evitar pedir login en cada recarga
+                cacheLocation: "sessionStorage", 
                 storeAuthStateInCookie: false,
             }
         };
 
         const siteUrl = "https://grupoimade.sharepoint.com/sites/CONTABILIDAD_IMADE";
         
-        // El scope que necesita MSAL para SharePoint
         const tokenRequest = {
             scopes: ["https://grupoimade.sharepoint.com/.default"]
         };
@@ -142,23 +136,17 @@
         // LÓGICA DE INICIO DE SESIÓN TRANSPARENTE (SSO)
         async function initializeAuth() {
             try {
-                // Manejar la respuesta si venimos de un redireccionamiento de Microsoft
                 const response = await msalInstance.handleRedirectPromise();
                 
                 if (response !== null) {
-                    // Si acabamos de ser redirigidos exitosamente, cargamos UI
                     handleUIUpdate(response.account);
                     loadSharePointData();
                 } else {
-                    // Si apenas entramos a la página, revisamos si ya hay cuentas guardadas
                     const currentAccounts = msalInstance.getAllAccounts();
                     
                     if (currentAccounts.length === 0) {
-                        // NO hay sesión. Redirigimos AUTOMÁTICAMENTE al login de Microsoft sin preguntar.
-                        // (Si el usuario ya tiene sesión en su Windows/Navegador, esto pasará súper rápido).
                         msalInstance.loginRedirect(tokenRequest);
                     } else {
-                        // YA hay sesión activa guardada. Pasamos directo.
                         handleUIUpdate(currentAccounts[0]);
                         loadSharePointData();
                     }
@@ -173,12 +161,10 @@
             }
         }
 
-        // Función de cierre de sesión manual
         function signOut() {
             msalInstance.logoutRedirect();
         }
 
-        // Actualiza la interfaz ocultando el loader y mostrando el dashboard
         function handleUIUpdate(account) {
             if (account) {
                 document.getElementById('authLoadingScreen').classList.add('hidden');
@@ -189,11 +175,9 @@
             }
         }
 
-        // Cambiar entre pestañas
         function changeList(listName, btnElement) {
             currentList = listName;
             
-            // Actualizar diseño de pestañas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-white', 'text-brand-dark', 'shadow-sm');
                 btn.classList.add('text-gray-500', 'hover:text-gray-700');
@@ -202,6 +186,20 @@
             btnElement.classList.add('bg-white', 'text-brand-dark', 'shadow-sm');
 
             loadSharePointData();
+        }
+
+        // Función para renderizar el badge de estado
+        function getStatusBadge(estadoStr) {
+            const estado = estadoStr || '';
+            if(estado.toLowerCase().includes('finalizado')) {
+                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
+            } else if(estado.toLowerCase().includes('espera')) {
+                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#008272] text-white">En espera</span>`;
+            } else if(estado.toLowerCase().includes('rechazado')) {
+                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#a80000] text-white">Rechazado</span>`;
+            } else {
+                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-500 text-white">${estado || 'Sin estado'}</span>`;
+            }
         }
 
         // FETCH API: Descargar datos de SharePoint
@@ -214,14 +212,13 @@
             tbody.innerHTML = '';
 
             try {
-                // Obtener token de acceso
                 const tokenResponse = await msalInstance.acquireTokenSilent({
                     ...tokenRequest,
                     account: accounts[0]
                 });
 
-                // Llamada REST a la lista de SharePoint seleccionada
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$select=Id,Title,Created,Author/Title&$expand=Author`;
+                // Cambiamos la petición: Eliminamos $select para que SharePoint nos devuelva TODAS las columnas personalizadas.
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$expand=Author`;
                 
                 const response = await fetch(endpoint, {
                     headers: {
@@ -237,7 +234,7 @@
 
             } catch (error) {
                 console.error("Error trayendo datos:", error);
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Error al cargar la lista "${currentList}". Verifica que el nombre de la lista sea exacto y que tengas permisos.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar la lista "${currentList}". Verifica que el nombre de la lista sea exacto y que tengas permisos.</td></tr>`;
             } finally {
                 document.getElementById('loadingSpinner').classList.add('hidden');
             }
@@ -248,26 +245,47 @@
             const tbody = document.getElementById('tableBody');
             
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
                 return;
             }
 
             items.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 transition-colors';
+                tr.className = 'hover:bg-gray-50 transition-colors group';
                 
-                const fecha = new Date(item.Created).toLocaleDateString('es-ES');
+                // Extraer datos usando los posibles "Internal Names" de SharePoint
+                // Si la columna "Sucursal" viene vacía, intentamos con Title como respaldo
+                const sucursal = item.Sucursal || item.Title || 'N/A';
+                
+                // Buscar el campo de usuario declarante. Como a veces es un campo de texto o un campo de persona, revisamos varios
+                let usuario = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+                
+                // Formatear la fecha. Usamos la Fecha Cierre si existe, si no, la fecha de creación
+                const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
+                const fecha = new Date(rawFecha).toLocaleDateString('es-ES');
+                
+                const observaciones = item.Observaciones || '-';
+                
+                // Determinamos el estado. Si la columna "Estado" no existe en la API, deducimos por la pestaña actual
+                let estadoFiltro = item.Estado || '';
+                if (!estadoFiltro) {
+                    if (currentList === 'CIERRES') estadoFiltro = 'En espera';
+                    else if (currentList === 'Cierres Finalizados') estadoFiltro = 'Finalizado';
+                    else estadoFiltro = 'Rechazado';
+                }
                 
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.Title || 'Sin título'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fecha}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sucursal}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div class="flex items-center gap-2">
-                            <div class="h-6 w-6 rounded-full bg-brand-light/20 flex items-center justify-center text-xs font-bold text-brand-dark">${item.Author?.Title?.charAt(0) || '?'}</div>
-                            ${item.Author?.Title || 'Desconocido'}
+                            <div class="h-6 w-6 rounded-full bg-brand-light/20 flex items-center justify-center text-xs font-bold text-brand-dark">${usuario.charAt(0)}</div>
+                            ${usuario}
                         </div>
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="${observaciones}">${observaciones}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">${getStatusBadge(estadoFiltro)}</td>
                 `;
                 tbody.appendChild(tr);
             });
