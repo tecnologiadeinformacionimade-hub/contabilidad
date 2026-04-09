@@ -25,6 +25,10 @@
         .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* Animación para el modal */
+        .modal-enter { animation: modalEnter 0.2s ease-out forwards; }
+        @keyframes modalEnter { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="font-sans text-gray-800 antialiased min-h-screen flex flex-col">
@@ -40,7 +44,6 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span id="userNameDisplay" class="text-sm font-medium text-gray-700 hidden"></span>
-                    <!-- Botones de sesión ocultos por defecto, solo se muestran si hay un error o se desea salir manualmente -->
                     <button id="logoutButton" onclick="signOut()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition">Salir</button>
                 </div>
             </div>
@@ -54,13 +57,13 @@
         <p class="text-gray-500">Conectando de forma segura con Grupo Imade.</p>
     </div>
 
-    <!-- Contenido Principal (Se muestra automáticamente al autenticar) -->
+    <!-- Contenido Principal -->
     <main id="dashboardScreen" class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden fade-in">
         
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">Gestión Unificada de Cierres</h2>
-                <p class="text-sm text-gray-500 mt-1">Datos obtenidos en tiempo real desde SharePoint.</p>
+                <p class="text-sm text-gray-500 mt-1">Sincronización en tiempo real con SharePoint. Edita para notificar.</p>
             </div>
             <button onclick="loadSharePointData()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -80,7 +83,6 @@
             </div>
 
             <div class="overflow-x-auto custom-scrollbar relative min-h-[300px]">
-                
                 <!-- Spinner de carga de tabla -->
                 <div id="loadingSpinner" class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 hidden">
                     <svg class="animate-spin h-8 w-8 text-brand-light mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -93,18 +95,92 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">ID</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha Cierre</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sucursal</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuario Declarante</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Observaciones</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Declarante</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Adjuntos</th>
                             <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="bg-white divide-y divide-gray-200 fade-in">
-                        <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Cargando...</td></tr>
+                        <tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
+
+    <!-- MODAL DE EDICIÓN Y DETALLE -->
+    <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden modal-enter flex flex-col max-h-[90vh]">
+            
+            <!-- Cabecera del Modal -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="text-brand-light" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Detalle de Cierre #<span id="modalId">--</span>
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Cuerpo del Modal (Scrollable) -->
+            <div class="px-6 py-4 overflow-y-auto custom-scrollbar flex-1">
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase">Sucursal</p>
+                        <p id="modalSucursal" class="text-sm font-medium text-gray-900">--</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase">Declarante</p>
+                        <p id="modalUsuario" class="text-sm font-medium text-gray-900">--</p>
+                    </div>
+                </div>
+
+                <!-- Archivos Adjuntos -->
+                <div class="mb-6">
+                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Archivos Adjuntos (Soportes)</p>
+                    <div id="modalAdjuntos" class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm flex flex-col gap-2">
+                        <!-- Enlaces inyectados aquí -->
+                    </div>
+                </div>
+
+                <hr class="border-gray-200 my-4">
+
+                <!-- Formulario de Edición -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado del Cierre</label>
+                        <select id="inputEstado" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition">
+                            <option value="En espera">En espera</option>
+                            <option value="Finalizado">Finalizado</option>
+                            <option value="Rechazado">Rechazado</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones (Usuario)</label>
+                        <textarea id="inputObservaciones" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe observaciones aquí..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Comentarios (IT / Contabilidad) - <span class="text-xs text-brand-light">Desencadena Correo</span></label>
+                        <textarea id="inputComentarios" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe un comentario. Al guardar, esto notificará por correo."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie del Modal -->
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                <button onclick="saveItemChanges()" id="btnSave" class="px-4 py-2 text-sm font-medium text-white bg-brand-dark rounded-lg hover:bg-blue-800 transition flex items-center gap-2">
+                    <span id="btnSaveText">Guardar y Notificar</span>
+                    <svg id="btnSaveSpinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- LÓGICA DE API Y AUTENTICACIÓN -->
     <script>
@@ -117,33 +193,27 @@
                 authority: "https://login.microsoftonline.com/f22a53bd-afee-40ff-ad90-859eb01980fb",
                 redirectUri: window.location.href 
             },
-            cache: {
-                cacheLocation: "sessionStorage", 
-                storeAuthStateInCookie: false,
-            }
+            cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
         };
 
         const siteUrl = "https://grupoimade.sharepoint.com/sites/CONTABILIDAD_IMADE";
-        
-        const tokenRequest = {
-            scopes: ["https://grupoimade.sharepoint.com/.default"]
-        };
+        const tokenRequest = { scopes: ["https://grupoimade.sharepoint.com/.default"] };
         // ==========================================
 
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentList = 'CIERRES';
+        let allItemsData = []; // Guardará los datos cargados para usarlos en el modal
+        let currentEditingId = null;
 
         // LÓGICA DE INICIO DE SESIÓN TRANSPARENTE (SSO)
         async function initializeAuth() {
             try {
                 const response = await msalInstance.handleRedirectPromise();
-                
                 if (response !== null) {
                     handleUIUpdate(response.account);
                     loadSharePointData();
                 } else {
                     const currentAccounts = msalInstance.getAllAccounts();
-                    
                     if (currentAccounts.length === 0) {
                         msalInstance.loginRedirect(tokenRequest);
                     } else {
@@ -152,18 +222,12 @@
                     }
                 }
             } catch (error) {
-                console.error("Error en la autenticación silenciosa:", error);
-                document.getElementById('authLoadingScreen').innerHTML = `
-                    <div class="text-red-500 mb-4"><svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                    <h2 class="text-xl font-bold text-gray-900">Error de Autenticación</h2>
-                    <p class="text-gray-500 mt-2">Asegúrate de que el Client ID y Tenant ID estén configurados en el código.</p>
-                `;
+                console.error("Error en auth:", error);
+                document.getElementById('authLoadingScreen').innerHTML = `<div class="text-red-500 mb-4">Error de Autenticación</div>`;
             }
         }
 
-        function signOut() {
-            msalInstance.logoutRedirect();
-        }
+        function signOut() { msalInstance.logoutRedirect(); }
 
         function handleUIUpdate(account) {
             if (account) {
@@ -177,29 +241,22 @@
 
         function changeList(listName, btnElement) {
             currentList = listName;
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-white', 'text-brand-dark', 'shadow-sm');
                 btn.classList.add('text-gray-500', 'hover:text-gray-700');
             });
             btnElement.classList.remove('text-gray-500', 'hover:text-gray-700');
             btnElement.classList.add('bg-white', 'text-brand-dark', 'shadow-sm');
-
             loadSharePointData();
         }
 
         // Función para renderizar el badge de estado
         function getStatusBadge(estadoStr) {
             const estado = estadoStr || '';
-            if(estado.toLowerCase().includes('finalizado')) {
-                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
-            } else if(estado.toLowerCase().includes('espera')) {
-                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#008272] text-white">En espera</span>`;
-            } else if(estado.toLowerCase().includes('rechazado')) {
-                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#a80000] text-white">Rechazado</span>`;
-            } else {
-                return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-500 text-white">${estado || 'Sin estado'}</span>`;
-            }
+            if(estado.toLowerCase().includes('finalizado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
+            if(estado.toLowerCase().includes('espera')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#008272] text-white">En espera</span>`;
+            if(estado.toLowerCase().includes('rechazado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#a80000] text-white">Rechazado</span>`;
+            return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-500 text-white">${estado || 'N/A'}</span>`;
         }
 
         // FETCH API: Descargar datos de SharePoint
@@ -212,29 +269,24 @@
             tbody.innerHTML = '';
 
             try {
-                const tokenResponse = await msalInstance.acquireTokenSilent({
-                    ...tokenRequest,
-                    account: accounts[0]
-                });
+                const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                // CORRECCIÓN: Agregamos $select=* para pedir todas las columnas mientras expandimos Author.
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$select=*,Author/Title&$expand=Author`;
+                // CORRECCIÓN MAGNA: $top=5000 para traer todos. Expandimos AttachmentFiles para ver adjuntos.
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,AttachmentFiles&$expand=Author,AttachmentFiles`;
                 
                 const response = await fetch(endpoint, {
-                    headers: {
-                        "Authorization": `Bearer ${tokenResponse.accessToken}`,
-                        "Accept": "application/json;odata=nometadata"
-                    }
+                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
                 });
 
-                if (!response.ok) throw new Error("Error en la petición a SharePoint");
+                if (!response.ok) throw new Error("Error fetching SharePoint");
                 
                 const data = await response.json();
-                renderTable(data.value);
+                allItemsData = data.value; // Guardamos en memoria
+                renderTable(allItemsData);
 
             } catch (error) {
                 console.error("Error trayendo datos:", error);
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar la lista "${currentList}". Verifica que el nombre de la lista sea exacto y que tengas permisos.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error al cargar datos.</td></tr>`;
             } finally {
                 document.getElementById('loadingSpinner').classList.add('hidden');
             }
@@ -243,9 +295,8 @@
         // Renderizar datos en el HTML
         function renderTable(items) {
             const tbody = document.getElementById('tableBody');
-            
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay elementos.</td></tr>`;
                 return;
             }
 
@@ -253,47 +304,134 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors group';
                 
-                // Extraer datos usando los posibles "Internal Names" de SharePoint
-                // Si la columna "Sucursal" viene vacía, intentamos con Title como respaldo
                 const sucursal = item.Sucursal || item.Title || 'N/A';
-                
-                // Buscar el campo de usuario declarante. Como a veces es un campo de texto o un campo de persona, revisamos varios
                 let usuario = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
                 
-                // Formatear la fecha. Usamos la Fecha Cierre si existe, si no, la fecha de creación
                 const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
                 const fecha = new Date(rawFecha).toLocaleDateString('es-ES');
                 
-                const observaciones = item.Observaciones || '-';
-                
-                // Determinamos el estado. Si la columna "Estado" no existe en la API, deducimos por la pestaña actual
-                let estadoFiltro = item.Estado || '';
-                if (!estadoFiltro) {
-                    if (currentList === 'CIERRES') estadoFiltro = 'En espera';
-                    else if (currentList === 'Cierres Finalizados') estadoFiltro = 'Finalizado';
-                    else estadoFiltro = 'Rechazado';
-                }
+                let estadoFiltro = item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
+
+                // Lógica de ícono de adjuntos
+                const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
+                const adjuntosHtml = tieneAdjuntos 
+                    ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
+                    : `<span class="text-gray-300">-</span>`;
                 
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Id}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fecha}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sucursal}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div class="flex items-center gap-2">
-                            <div class="h-6 w-6 rounded-full bg-brand-light/20 flex items-center justify-center text-xs font-bold text-brand-dark">${usuario.charAt(0)}</div>
-                            ${usuario}
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="${observaciones}">${observaciones}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${usuario}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center">${adjuntosHtml}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center">${getStatusBadge(estadoFiltro)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <button onclick="openModal(${item.Id})" class="text-brand-light hover:text-brand-dark bg-brand-light/10 hover:bg-brand-light/20 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                            Ver / Editar
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Iniciar el flujo de autenticación apenas cargue la página
-        window.onload = initializeAuth;
+        // ==========================================
+        // LÓGICA DEL MODAL Y ACTUALIZACIÓN (PATCH)
+        // ==========================================
+        function openModal(id) {
+            const item = allItemsData.find(i => i.Id === id);
+            if(!item) return;
+            currentEditingId = id;
 
+            // Poblar textos básicos
+            document.getElementById('modalId').innerText = item.Id;
+            document.getElementById('modalSucursal').innerText = item.Sucursal || item.Title || 'N/A';
+            document.getElementById('modalUsuario').innerText = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+            
+            // Poblar Select e Inputs
+            document.getElementById('inputEstado').value = item.Estado || 'En espera';
+            document.getElementById('inputObservaciones').value = item.Observaciones || '';
+            document.getElementById('inputComentarios').value = item.Comentarios || '';
+
+            // Poblar Adjuntos
+            const adjuntosContainer = document.getElementById('modalAdjuntos');
+            adjuntosContainer.innerHTML = '';
+            if(item.AttachmentFiles && item.AttachmentFiles.length > 0) {
+                item.AttachmentFiles.forEach(file => {
+                    const link = document.createElement('a');
+                    // El ServerRelativeUrl nos sirve para abrir el archivo
+                    link.href = `https://grupoimade.sharepoint.com${file.ServerRelativeUrl}`;
+                    link.target = '_blank';
+                    link.className = "flex items-center gap-2 text-brand-dark hover:underline p-2 rounded hover:bg-gray-200 transition";
+                    link.innerHTML = `<svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> ${file.FileName}`;
+                    adjuntosContainer.appendChild(link);
+                });
+            } else {
+                adjuntosContainer.innerHTML = '<span class="text-gray-400 italic">No hay archivos adjuntos en este cierre.</span>';
+            }
+
+            // Mostrar Modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            currentEditingId = null;
+        }
+
+        async function saveItemChanges() {
+            if(!currentEditingId) return;
+            
+            const btn = document.getElementById('btnSave');
+            const spinner = document.getElementById('btnSaveSpinner');
+            const btnText = document.getElementById('btnSaveText');
+            
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            btnText.innerText = "Guardando...";
+
+            const accounts = msalInstance.getAllAccounts();
+            try {
+                const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
+                
+                const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items(${currentEditingId})`;
+                
+                // Extraemos valores del modal
+                const payload = {
+                    Estado: document.getElementById('inputEstado').value,
+                    Observaciones: document.getElementById('inputObservaciones').value,
+                    Comentarios: document.getElementById('inputComentarios').value
+                };
+
+                const response = await fetch(updateEndpoint, {
+                    method: 'PATCH', // PATCH o POST con X-HTTP-Method=MERGE es lo requerido por SharePoint
+                    headers: {
+                        "Authorization": `Bearer ${tokenResponse.accessToken}`,
+                        "Accept": "application/json;odata=nometadata",
+                        "Content-Type": "application/json;odata=nometadata",
+                        "IF-MATCH": "*", // Sobrescribir sin importar la versión
+                        "X-HTTP-Method": "MERGE"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("Fallo al actualizar el item");
+
+                // Éxito: Cerrar modal y recargar
+                closeModal();
+                loadSharePointData();
+
+            } catch(error) {
+                console.error("Error guardando:", error);
+                alert("Hubo un error al guardar los cambios. Verifica tus permisos de edición en la lista de SharePoint.");
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                btnText.innerText = "Guardar y Notificar";
+            }
+        }
+
+        window.onload = initializeAuth;
     </script>
 </body>
 </html>
