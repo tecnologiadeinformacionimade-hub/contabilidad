@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cierres - Grupo Imade</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MSAL.js para Autenticación con Microsoft 365 -->
+    <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
+    
+    <!-- Configuración de colores -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { dark: '#2A3C84', light: '#41A8DC', bg: '#F4F7F9' } }, fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], } }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { background-color: #F8FAFC; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar superior -->
+    <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-4">
+                    <img src="logo.png" alt="Grupo Imade" class="h-10 object-contain" onerror="this.src='https://via.placeholder.com/150x50?text=Grupo+Imade'">
+                    <div class="h-6 w-px bg-gray-300 hidden sm:block"></div>
+                    <h1 class="text-xl font-bold text-brand-dark hidden sm:block">Contabilidad <span class="text-gray-400 font-normal text-sm ml-2">| Cierres (API)</span></h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="userNameDisplay" class="text-sm font-medium text-gray-700 hidden"></span>
+                    <button id="loginButton" onclick="signIn()" class="bg-brand-dark text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-800 transition">Iniciar Sesión</button>
+                    <button id="logoutButton" onclick="signOut()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition">Salir</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Pantalla de Bienvenida (Antes de login) -->
+    <div id="welcomeScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
+        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 max-w-md w-full">
+            <svg class="mx-auto h-12 w-12 text-brand-light mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Acceso a Cierres</h2>
+            <p class="text-gray-500 mb-6">Inicia sesión con tu cuenta de Grupo Imade para cargar los datos desde SharePoint.</p>
+            <button onclick="signIn()" class="w-full bg-brand-dark text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-800 transition shadow-md">Conectar con Microsoft 365</button>
+        </div>
+    </div>
+
+    <!-- Contenido Principal (Después de login) -->
+    <main id="dashboardScreen" class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden fade-in">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Gestión Unificada de Cierres</h2>
+                <p class="text-sm text-gray-500 mt-1">Datos obtenidos en tiempo real desde SharePoint.</p>
+            </div>
+            <button onclick="loadSharePointData()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Actualizar Datos
+            </button>
+        </div>
+
+        <!-- Controles y Tabla -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            <div class="border-b border-gray-200 px-4 py-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50">
+                <div class="flex space-x-1 bg-gray-200/50 p-1 rounded-lg self-start">
+                    <!-- Los botones llaman a la API con el nombre de la lista correspondiente -->
+                    <button onclick="changeList('CIERRES', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md bg-white text-brand-dark shadow-sm transition-all">En Espera</button>
+                    <button onclick="changeList('Cierres Finalizados', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Finalizados</button>
+                    <button onclick="changeList('Cierres Rechazados', this)" class="tab-btn px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Rechazados</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar relative min-h-[300px]">
+                
+                <!-- Spinner de carga -->
+                <div id="loadingSpinner" class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 hidden">
+                    <svg class="animate-spin h-8 w-8 text-brand-light mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-sm font-medium text-gray-600">Obteniendo datos de SharePoint...</span>
+                </div>
+
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Título / Sucursal</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha Creación</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Creado por</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200 fade-in">
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Selecciona una lista para cargar los datos.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- LÓGICA DE API Y AUTENTICACIÓN -->
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN PARA IT (¡IMPORTANTE LLENAR ESTO!)
+        // ==========================================
+        const msalConfig = {
+            auth: {
+                // 1. Ve a entra.microsoft.com -> Registros de aplicaciones -> Nuevo registro.
+                // 2. En "URI de redirección", pon "Aplicación de página única (SPA)" y la URL donde esté alojado este HTML (ej. http://localhost o tu servidor).
+                // 3. Copia el ID de la aplicación (cliente) y pégalo aquí:
+                clientId: "INGRESA_AQUI_TU_CLIENT_ID", 
+                
+                // 4. Copia el ID del directorio (inquilino/tenant) y reemplaza la palabra "INGRESA_AQUI_TU_TENANT_ID":
+                authority: "https://login.microsoftonline.com/INGRESA_AQUI_TU_TENANT_ID"
+            }
+        };
+
+        const siteUrl = "https://grupoimade.sharepoint.com/sites/CONTABILIDAD_IMADE";
+        
+        // El scope que necesita MSAL para SharePoint
+        const tokenRequest = {
+            scopes: ["https://grupoimade.sharepoint.com/.default"]
+        };
+        // ==========================================
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        let currentList = 'CIERRES';
+
+        // Función de inicio de sesión
+        async function signIn() {
+            try {
+                const loginResponse = await msalInstance.loginPopup(tokenRequest);
+                handleUIUpdate(loginResponse.account);
+                loadSharePointData();
+            } catch (error) {
+                console.error("Error en login:", error);
+                if(error.message.includes("ClientAuthError")) {
+                    alert("Asegúrate de haber configurado el ClientId y TenantId en el código HTML.");
+                }
+            }
+        }
+
+        // Función de cierre de sesión
+        function signOut() {
+            msalInstance.logoutPopup();
+            handleUIUpdate(null);
+        }
+
+        // Verifica si ya hay sesión activa al recargar la página
+        msalInstance.handleRedirectPromise().then(() => {
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length > 0) {
+                handleUIUpdate(accounts[0]);
+                loadSharePointData();
+            }
+        });
+
+        // Actualiza la interfaz dependiendo si hay usuario logueado
+        function handleUIUpdate(account) {
+            if (account) {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                document.getElementById('loginButton').classList.add('hidden');
+                document.getElementById('logoutButton').classList.remove('hidden');
+                document.getElementById('userNameDisplay').classList.remove('hidden');
+                document.getElementById('userNameDisplay').innerText = "Hola, " + account.name;
+            } else {
+                document.getElementById('welcomeScreen').classList.remove('hidden');
+                document.getElementById('dashboardScreen').classList.add('hidden');
+                document.getElementById('loginButton').classList.remove('hidden');
+                document.getElementById('logoutButton').classList.add('hidden');
+                document.getElementById('userNameDisplay').classList.add('hidden');
+            }
+        }
+
+        // Cambiar entre pestañas
+        function changeList(listName, btnElement) {
+            currentList = listName;
+            
+            // Actualizar diseño de pestañas
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-brand-dark', 'shadow-sm');
+                btn.classList.add('text-gray-500', 'hover:text-gray-700');
+            });
+            btnElement.classList.remove('text-gray-500', 'hover:text-gray-700');
+            btnElement.classList.add('bg-white', 'text-brand-dark', 'shadow-sm');
+
+            loadSharePointData();
+        }
+
+        // FETCH API: Descargar datos de SharePoint
+        async function loadSharePointData() {
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length === 0) return;
+
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            try {
+                // Obtener token silenciosamente
+                const tokenResponse = await msalInstance.acquireTokenSilent({
+                    ...tokenRequest,
+                    account: accounts[0]
+                });
+
+                // Llamada REST a la lista de SharePoint seleccionada (Añadí $expand para traer el nombre del autor)
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$select=Id,Title,Created,Author/Title&$expand=Author`;
+                
+                const response = await fetch(endpoint, {
+                    headers: {
+                        "Authorization": `Bearer ${tokenResponse.accessToken}`,
+                        "Accept": "application/json;odata=nometadata"
+                    }
+                });
+
+                if (!response.ok) throw new Error("Error en la petición a SharePoint");
+                
+                const data = await response.json();
+                renderTable(data.value);
+
+            } catch (error) {
+                console.error("Error trayendo datos:", error);
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Error al cargar la lista "${currentList}". Verifica que el nombre de la lista sea exacto y que tengas permisos.</td></tr>`;
+            } finally {
+                document.getElementById('loadingSpinner').classList.add('hidden');
+            }
+        }
+
+        // Renderizar datos en el HTML
+        function renderTable(items) {
+            const tbody = document.getElementById('tableBody');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
+                return;
+            }
+
+            items.forEach(item => {
+                // IT: Aquí puedes agregar las columnas internas personalizadas de tu lista SharePoint (ej. item.Sucursal, item.Observaciones)
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                
+                // Formatear fecha
+                const fecha = new Date(item.Created).toLocaleDateString('es-ES');
+                
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.Title || 'Sin título'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fecha}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div class="flex items-center gap-2">
+                            <div class="h-6 w-6 rounded-full bg-brand-light/20 flex items-center justify-center text-xs font-bold text-brand-dark">${item.Author?.Title?.charAt(0) || '?'}</div>
+                            ${item.Author?.Title || 'Desconocido'}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
