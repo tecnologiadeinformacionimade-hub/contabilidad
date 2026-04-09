@@ -259,12 +259,29 @@
             loadSharePointData();
         }
 
+        // Función para renderizar el badge de estado
         function getStatusBadge(estadoStr) {
             const estado = estadoStr || '';
             if(estado.toLowerCase().includes('finalizado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
             if(estado.toLowerCase().includes('espera')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#008272] text-white">En espera</span>`;
             if(estado.toLowerCase().includes('rechazado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#a80000] text-white">Rechazado</span>`;
             return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-500 text-white">${estado || 'N/A'}</span>`;
+        }
+
+        /**
+         * Función utilitaria para extraer el texto legible de un campo de SharePoint,
+         * manejando si es un texto simple, un lookup (objeto), una opción, etc.
+         */
+        function getFieldText(item, fieldName) {
+            const val = item[fieldName];
+            if (val === null || val === undefined) return '';
+            
+            // Si es un objeto (como un Lookup o un campo de Persona)
+            if (typeof val === 'object') {
+                return val.Title || val.Label || val.Value || JSON.stringify(val);
+            }
+            
+            return String(val);
         }
 
         // FETCH API: Descargar datos de SharePoint
@@ -279,16 +296,24 @@
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                // CORRECCIÓN DE LA API: Quitamos el "/*" de FieldValuesAsText que causaba el fallo, pero mantenemos su expansión
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,FieldValuesAsText&$expand=Author,AttachmentFiles,FieldValuesAsText`;
+                /**
+                 * REFACTORIZACIÓN API:
+                 * Eliminamos FieldValuesAsText que causaba el Error 400 (Unknown Error).
+                 * En su lugar, intentamos expandir específicamente los campos que sabemos que son Lookups (como Sucursal).
+                 * Agregamos soporte para campos de persona/autor.
+                 */
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,Sucursal/Title&$expand=Author,AttachmentFiles,Sucursal`;
                 
                 const response = await fetch(endpoint, {
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
+                    headers: { 
+                        "Authorization": `Bearer ${tokenResponse.accessToken}`, 
+                        "Accept": "application/json;odata=nometadata" 
+                    }
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(`Error en la respuesta de SharePoint: ${errorText}`);
+                    throw new Error(`SharePoint respondió con error: ${errorText}`);
                 }
                 
                 const data = await response.json();
@@ -297,8 +322,7 @@
 
             } catch (error) {
                 console.error("Error trayendo datos:", error);
-                // Ahora el error mostrará en pantalla el mensaje técnico exacto para que sepamos por qué falla
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error al cargar datos: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500 font-medium">Error al cargar la información: <br/> <span class="text-xs font-mono opacity-70">${error.message}</span></td></tr>`;
             } finally {
                 document.getElementById('loadingSpinner').classList.add('hidden');
             }
@@ -308,43 +332,43 @@
         function renderTable(items) {
             const tbody = document.getElementById('tableBody');
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay registros disponibles en esta vista.</td></tr>`;
                 return;
             }
 
             items.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 transition-colors group';
+                tr.className = 'hover:bg-gray-50 transition-colors group border-b border-gray-100';
                 
-                // MÁGIA DE LA API: Extraer el texto real de FieldValuesAsText (evita que salgan IDs como "2053")
-                const fv = item.FieldValuesAsText || {};
+                // Extracción de datos inteligente
+                // Sucursal: si expandimos Sucursal, el texto está en Sucursal.Title. Si no, mostramos el ID o Title como respaldo.
+                let sucursal = getFieldText(item, 'Sucursal') || item.Title || 'N/A';
                 
-                let sucursal = fv.Sucursal || item.Sucursal || item.Title || 'N/A';
-                if (typeof sucursal === 'object' && sucursal !== null) { sucursal = sucursal.Title || sucursal.Label || 'N/A'; }
+                // Usuario Declarante: Buscamos en varios campos posibles
+                let usuario = getFieldText(item, 'Usuario_x0020_Declarante') || getFieldText(item, 'UsuarioDeclarante') || item.Author?.Title || 'Desconocido';
                 
-                let usuario = fv.Usuario_x0020_Declarante || item.Usuario_x0020_Declarante || item.Author?.Title || 'Desconocido';
-                if (typeof usuario === 'object' && usuario !== null) { usuario = usuario.Title || usuario.Label || 'Desconocido'; }
+                // Fecha: Priorizamos Fecha Cierre, luego la creación
+                const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
+                const fecha = rawFecha ? new Date(rawFecha).toLocaleDateString('es-ES') : 'N/A';
                 
-                const rawFecha = fv.Fecha_x0020_Cierre || item.Fecha_x0020_Cierre || item.Created;
-                const fecha = new Date(rawFecha).toLocaleDateString('es-ES');
-                
-                let estadoFiltro = fv.Estado || item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
+                // Estado: Lógica de pestaña si el campo viene vacío
+                let estadoFiltro = item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
 
                 const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
                 const adjuntosHtml = tieneAdjuntos 
-                    ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
+                    ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs" title="${item.AttachmentFiles.length} archivos"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
                     : `<span class="text-gray-300">-</span>`;
                 
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fecha}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sucursal}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${usuario}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">${fecha}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${sucursal}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${usuario}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-center">${adjuntosHtml}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center">${getStatusBadge(estadoFiltro)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <button onclick="openModal(${item.Id})" class="text-brand-light hover:text-brand-dark bg-brand-light/10 hover:bg-brand-light/20 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                            Ver / Editar
+                        <button onclick="openModal(${item.Id})" class="text-brand-light hover:text-brand-dark bg-brand-light/10 hover:bg-brand-light/20 px-3 py-1.5 rounded-md text-sm font-semibold transition-all">
+                            Gestionar
                         </button>
                     </td>
                 `;
@@ -360,21 +384,16 @@
             if(!item) return;
             currentEditingId = id;
             
-            const fv = item.FieldValuesAsText || {};
-
-            let sucursalStr = fv.Sucursal || item.Sucursal || item.Title || 'N/A';
-            if(typeof sucursalStr === 'object') sucursalStr = sucursalStr.Title || sucursalStr.Label || 'N/A';
-            
-            let usuarioStr = fv.Usuario_x0020_Declarante || item.Usuario_x0020_Declarante || item.Author?.Title || 'Desconocido';
-            if(typeof usuarioStr === 'object') usuarioStr = usuarioStr.Title || usuarioStr.Label || 'Desconocido';
+            const sucursalStr = getFieldText(item, 'Sucursal') || item.Title || 'N/A';
+            const usuarioStr = getFieldText(item, 'Usuario_x0020_Declarante') || getFieldText(item, 'UsuarioDeclarante') || item.Author?.Title || 'Desconocido';
 
             document.getElementById('modalId').innerText = item.Id;
             document.getElementById('modalSucursal').innerText = sucursalStr;
             document.getElementById('modalUsuario').innerText = usuarioStr;
             
-            document.getElementById('inputEstado').value = fv.Estado || item.Estado || 'En espera';
-            document.getElementById('inputObservaciones').value = fv.Observaciones || item.Observaciones || '';
-            document.getElementById('inputComentarios').value = fv.Comentarios || item.Comentarios || '';
+            document.getElementById('inputEstado').value = item.Estado || 'En espera';
+            document.getElementById('inputObservaciones').value = item.Observaciones || '';
+            document.getElementById('inputComentarios').value = item.Comentarios || '';
 
             const adjuntosContainer = document.getElementById('modalAdjuntos');
             adjuntosContainer.innerHTML = '';
@@ -383,8 +402,8 @@
                     const link = document.createElement('a');
                     link.href = `https://grupoimade.sharepoint.com${file.ServerRelativeUrl}`;
                     link.target = '_blank';
-                    link.className = "flex items-center gap-2 text-brand-dark hover:underline p-2 rounded hover:bg-gray-200 transition";
-                    link.innerHTML = `<svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> ${file.FileName}`;
+                    link.className = "flex items-center gap-2 text-brand-dark font-medium hover:underline p-2 rounded hover:bg-gray-100 transition";
+                    link.innerHTML = `<svg class="text-gray-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> ${file.FileName}`;
                     adjuntosContainer.appendChild(link);
                 });
             } else {
@@ -449,7 +468,7 @@
 
             } catch(error) {
                 console.error("Error guardando:", error);
-                alert(`Hubo un error al guardar los cambios en SharePoint.\n\nDetalle técnico:\n${error.message}\n\nSolución: Si el error dice "Access Denied", asegúrate de haber dado el permiso "AllSites.Write" en Entra ID.`);
+                alert(`Hubo un error al guardar los cambios en SharePoint.\n\nDetalle técnico:\n${error.message}\n\nSolución: Si el error dice "Access Denied", asegúrate de haber dado el permiso "AllSites.Manage" (Escritura) en Entra ID y concedido el consentimiento.`);
             } finally {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
