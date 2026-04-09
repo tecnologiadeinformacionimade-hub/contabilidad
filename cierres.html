@@ -188,32 +188,6 @@
         let allItemsData = [];
         let currentEditingId = null;
 
-        /**
-         * Función IT: Esta función busca el valor de Sucursal probando todos los nombres internos posibles
-         * que genera SharePoint para columnas personalizadas.
-         */
-        function findSucursalValue(item) {
-            // Probamos nombres comunes
-            const keysToTry = ['Sucursal', 'OData__Sucursal', 'SucursalId', 'Sucursal0'];
-            for (let key of keysToTry) {
-                if (item[key] !== undefined && item[key] !== null) {
-                    const val = item[key];
-                    if (typeof val === 'object') return val.Title || val.Label || val.Value || JSON.stringify(val);
-                    return String(val);
-                }
-            }
-            
-            // Si no lo encuentra por nombre exacto, busca cualquier propiedad que CONTENGA "Sucursal"
-            const wildcardKey = Object.keys(item).find(k => k.includes('Sucursal') && !k.includes('@'));
-            if (wildcardKey) {
-                const val = item[wildcardKey];
-                if (typeof val === 'object') return val.Title || val.Label || val.Value || 'N/A';
-                return String(val);
-            }
-            
-            return item.Title || 'N/A'; // Respaldo final
-        }
-
         async function initializeAuth() {
             try {
                 const response = await msalInstance.handleRedirectPromise();
@@ -266,6 +240,7 @@
             return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-500 text-white">${estado || 'N/A'}</span>`;
         }
 
+        // FETCH API: Descargar datos de SharePoint robusto
         async function loadSharePointData() {
             const accounts = msalInstance.getAllAccounts();
             if (accounts.length === 0) return;
@@ -276,14 +251,38 @@
 
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
+                const headers = { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" };
 
-                // CORRECCIÓN: Quitamos 'Sucursal' de expand/select para evitar el error 400.
-                // SharePoint traerá el campo automáticamente en el '*' si existe como columna simple o ID.
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title&$expand=Author,AttachmentFiles`;
+                // 1. PRIMER PASO: Obtener el diccionario de columnas de SharePoint para saber los nombres internos exactos
+                const fieldsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/Fields?$select=Title,InternalName,TypeAsString`;
+                const fieldsRes = await fetch(fieldsEndpoint, { headers });
+                if (!fieldsRes.ok) throw new Error("No se pudo obtener el esquema de la lista.");
+                const fieldsData = await fieldsRes.json();
+
+                // Función auxiliar para mapear el título visual ("Sucursal") a su nombre de base de datos ("OData__Sucursal")
+                const getIntName = (titles) => {
+                    const field = fieldsData.value.find(f => titles.some(t => f.Title.toLowerCase().includes(t.toLowerCase())));
+                    return field ? field.InternalName : null;
+                };
+
+                const intSucursal = getIntName(['Sucursal', 'Ubicaci', 'Agencia']);
+                const intDeclarante = getIntName(['Declarante', 'Usuario']);
+                const intEstado = getIntName(['Estado']);
+                const intObservaciones = getIntName(['Observacion']);
+                const intComentarios = getIntName(['Comentario']);
+
+                // 2. SEGUNDO PASO: Construir consulta para extraer el TEXTO de las columnas de búsqueda (Lookup)
+                const fvtSelects = [];
+                if (intSucursal) fvtSelects.push(`FieldValuesAsText/${intSucursal}`);
+                if (intDeclarante) fvtSelects.push(`FieldValuesAsText/${intDeclarante}`);
+                if (intEstado) fvtSelects.push(`FieldValuesAsText/${intEstado}`);
+
+                const expandStr = `Author,AttachmentFiles${fvtSelects.length > 0 ? ',FieldValuesAsText' : ''}`;
+                const selectStr = `*,Author/Title${fvtSelects.length > 0 ? ',' + fvtSelects.join(',') : ''}`;
                 
-                const response = await fetch(endpoint, {
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
-                });
+                const itemsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=${selectStr}&$expand=${expandStr}`;
+
+                const response = await fetch(itemsEndpoint, { headers });
 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -291,7 +290,29 @@
                 }
                 
                 const data = await response.json();
-                allItemsData = data.value; 
+                
+                // 3. TERCER PASO: Emparejar los datos devueltos listos para mostrar y guardar
+                allItemsData = data.value.map(item => {
+                    const fvt = item.FieldValuesAsText || {};
+                    
+                    let estadoVal = (intEstado && fvt[intEstado]) ? fvt[intEstado] : (item[intEstado] || item.Estado || '');
+                    if(!estadoVal) {
+                        estadoVal = currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado');
+                    }
+
+                    return {
+                        ...item,
+                        _parsedSucursal: (intSucursal && fvt[intSucursal]) ? fvt[intSucursal] : (item[intSucursal] || item.Title || 'N/A'),
+                        _parsedUsuario: (intDeclarante && fvt[intDeclarante]) ? fvt[intDeclarante] : (item[intDeclarante] || item.Author?.Title || 'Desconocido'),
+                        _parsedEstado: estadoVal,
+                        _parsedObservaciones: (intObservaciones ? item[intObservaciones] : item.Observaciones) || '',
+                        _parsedComentarios: (intComentarios ? item[intComentarios] : item.Comentarios) || '',
+                        // Guardamos los nombres internos exactos para usarlos en el botón de Guardar
+                        _intEstado: intEstado || 'Estado',
+                        _intComentarios: intComentarios || 'Comentarios'
+                    };
+                });
+
                 renderTable(allItemsData);
 
             } catch (error) {
@@ -313,17 +334,9 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors group border-b border-gray-100';
                 
-                // Usamos el buscador inteligente para la sucursal
-                let sucursal = findSucursalValue(item);
-                
-                // Buscamos usuario declarante
-                let usuario = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
-                
                 const rawFecha = item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
                 const fecha = rawFecha ? new Date(rawFecha).toLocaleDateString('es-ES') : 'N/A';
                 
-                let estadoFiltro = item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
-
                 const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
                 const adjuntosHtml = tieneAdjuntos 
                     ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
@@ -332,10 +345,10 @@
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.Id}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">${fecha}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${sucursal}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${usuario}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${item._parsedSucursal}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item._parsedUsuario}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-center">${adjuntosHtml}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">${getStatusBadge(estadoFiltro)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">${getStatusBadge(item._parsedEstado)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
                         <button onclick="openModal(${item.Id})" class="text-brand-light hover:text-brand-dark bg-brand-light/10 hover:bg-brand-light/20 px-3 py-1.5 rounded-md text-sm font-semibold transition-all">
                             Gestionar
@@ -352,12 +365,12 @@
             currentEditingId = id;
             
             document.getElementById('modalId').innerText = item.Id;
-            document.getElementById('modalSucursal').innerText = findSucursalValue(item);
-            document.getElementById('modalUsuario').innerText = item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+            document.getElementById('modalSucursal').innerText = item._parsedSucursal;
+            document.getElementById('modalUsuario').innerText = item._parsedUsuario;
             
-            document.getElementById('inputEstado').value = item.Estado || 'En espera';
-            document.getElementById('inputObservaciones').value = item.Observaciones || '';
-            document.getElementById('inputComentarios').value = item.Comentarios || '';
+            document.getElementById('inputEstado').value = item._parsedEstado;
+            document.getElementById('inputObservaciones').value = item._parsedObservaciones;
+            document.getElementById('inputComentarios').value = item._parsedComentarios;
 
             const adjuntosContainer = document.getElementById('modalAdjuntos');
             adjuntosContainer.innerHTML = '';
@@ -396,13 +409,14 @@
             const accounts = msalInstance.getAllAccounts();
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
+                const itemData = allItemsData.find(i => i.Id === currentEditingId);
                 
                 const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items(${currentEditingId})`;
                 
-                const payload = {
-                    Estado: document.getElementById('inputEstado').value,
-                    Comentarios: document.getElementById('inputComentarios').value
-                };
+                // Usamos los nombres internos exactos descubiertos en la carga inicial
+                const payload = {};
+                if(itemData._intEstado) payload[itemData._intEstado] = document.getElementById('inputEstado').value;
+                if(itemData._intComentarios) payload[itemData._intComentarios] = document.getElementById('inputComentarios').value;
 
                 const response = await fetch(updateEndpoint, {
                     method: 'PATCH', 
