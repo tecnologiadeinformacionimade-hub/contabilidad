@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal de Gestión - Grupo Imade</title>
+    <!-- Importamos Tailwind CSS para estilos rápidos y modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuramos los colores de la marca basándonos en tu logo -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#2A3C84',  /* Azul oscuro del logo */
+                            light: '#41A8DC', /* Celeste del logo */
+                            bg: '#F4F7F9'     /* Fondo suave */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estilos personalizados para animaciones fluidas -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            background-color: #F4F7F9;
+            background-image: radial-gradient(#41A8DC 0.5px, transparent 0.5px), radial-gradient(#41A8DC 0.5px, #F4F7F9 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            background-attachment: fixed;
+            opacity: 0.95;
+        }
+
+        .module-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(42, 60, 132, 0.15), 0 10px 10px -5px rgba(42, 60, 132, 0.04);
+            border-color: #41A8DC;
+        }
+
+        .module-card:active {
+            transform: translateY(2px) scale(0.98);
+        }
+
+        /* Animación de entrada flotante */
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-float-in {
+            animation: floatIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 antialiased text-gray-800">
+
+    <!-- Contenedor Principal (Layout adaptable: Fila en PC, Columna en Móvil) -->
+    <div class="w-full max-w-5xl bg-white rounded-[2rem] shadow-2xl shadow-brand-dark/10 overflow-hidden flex flex-col md:flex-row animate-float-in border border-white/50 backdrop-blur-sm">
+        
+        <!-- LADO IZQUIERDO: Branding (Logo y Bienvenida) -->
+        <!-- En móvil ocupa el 100% arriba, en PC ocupa el 40% a la izquierda -->
+        <div class="w-full md:w-5/12 lg:w-2/5 bg-gradient-to-b from-white to-gray-50 p-8 md:p-12 flex flex-col items-center justify-center relative border-b md:border-b-0 md:border-r border-gray-200/60">
+            
+            <!-- Decoración sutil de fondo -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-dark to-brand-light"></div>
+            
+            <div class="relative z-10 w-full max-w-[280px] flex flex-col items-center">
+                <!-- Logo con ajuste para que siempre se vea bien proporcionado -->
+                <img src="logo.png" alt="Grupo Imade Logo" class="w-full max-w-[200px] h-auto object-contain mb-8 filter drop-shadow-md"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x120?text=Logo+Grupo+Imade';">
+                
+                <h1 class="text-2xl md:text-3xl font-bold text-brand-dark text-center leading-tight mb-3">
+                    Portal de<br/>Operaciones
+                </h1>
+                <p class="text-gray-500 text-center text-sm md:text-base font-medium">
+                    Plataforma centralizada de gestión y control interno.
+                </p>
+            </div>
+        </div>
+
+        <!-- LADO DERECHO: Botones de Acción (Módulos) -->
+        <!-- En móvil ocupa el resto abajo, en PC el 60% a la derecha -->
+        <div class="w-full md:w-7/12 lg:w-3/5 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white">
+            
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-light"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Seleccione un módulo
+                </h2>
+                <p class="text-sm text-gray-400 mt-1">Haga clic en la opción que desea abrir.</p>
+            </div>
+
+            <!-- Grid de botones: 1 columna en móvil, 2 columnas en PC/Tablets grandes -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+                
+                <!-- TARJETA BOTÓN 1: Cierres -->
+                <button onclick="window.location.href='cierres.html'" class="module-card group relative bg-white border-2 border-gray-100 rounded-2xl p-6 text-left flex flex-col h-full focus:outline-none focus:ring-4 focus:ring-brand-dark/20">
+                    <div class="w-14 h-14 rounded-xl bg-brand-dark/10 flex items-center justify-center mb-4 group-hover:bg-brand-dark transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-dark group-hover:text-white transition-colors duration-300">
+                            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                            <path d="m9 13 2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-brand-dark transition-colors">Cierres</h3>
+                    <p class="text-sm text-gray-500 font-medium line-clamp-2">Gestión y verificación de cierres operativos.</p>
+                    
+                    <!-- Flecha indicadora -->
+                    <div class="mt-auto pt-4 flex justify-end opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-dark"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </div>
+                </button>
+
+                <!-- TARJETA BOTÓN 2: Creación de código -->
+                <button onclick="window.location.href='codigo.html'" class="module-card group relative bg-white border-2 border-gray-100 rounded-2xl p-6 text-left flex flex-col h-full focus:outline-none focus:ring-4 focus:ring-brand-light/20">
+                    <div class="w-14 h-14 rounded-xl bg-brand-light/10 flex items-center justify-center mb-4 group-hover:bg-brand-light transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-light group-hover:text-white transition-colors duration-300">
+                            <path d="m18 16 4-4-4-4"/>
+                            <path d="m6 8-4 4 4 4"/>
+                            <path d="m14.5 4-5 16"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-brand-light transition-colors">Creación de código</h3>
+                    <p class="text-sm text-gray-500 font-medium line-clamp-2">Generador y administrador de códigos de sistema.</p>
+                    
+                    <!-- Flecha indicadora -->
+                    <div class="mt-auto pt-4 flex justify-end opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-light"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </div>
+                </button>
+
+            </div>
+            
+            <!-- Footer pequeño dentro de la tarjeta derecha -->
+            <div class="mt-10 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-400">
+                <span>Versión 2.0</span>
+                <span class="text-center sm:text-right">&copy; Grupo Imade | Creado por el departamento de IT</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
