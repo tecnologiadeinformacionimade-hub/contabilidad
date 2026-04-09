@@ -234,7 +234,7 @@
         }
 
         function signOut() { 
-            sessionStorage.clear(); // Limpiamos caché por si los permisos se quedaron pegados
+            sessionStorage.clear(); 
             msalInstance.logoutRedirect(); 
         }
 
@@ -259,7 +259,6 @@
             loadSharePointData();
         }
 
-        // Función para renderizar el badge de estado
         function getStatusBadge(estadoStr) {
             const estado = estadoStr || '';
             if(estado.toLowerCase().includes('finalizado')) return `<span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#107c41] text-white">Finalizado</span>`;
@@ -280,22 +279,26 @@
             try {
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
 
-                // AGREGADO IMPORTANTÍSIMO: FieldValuesAsText fuerza a SharePoint a enviarnos el texto real, no los IDs
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,AttachmentFiles,FieldValuesAsText/*&$expand=Author,AttachmentFiles,FieldValuesAsText`;
+                // CORRECCIÓN DE LA API: Quitamos el "/*" de FieldValuesAsText que causaba el fallo, pero mantenemos su expansión
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items?$top=5000&$select=*,Author/Title,FieldValuesAsText&$expand=Author,AttachmentFiles,FieldValuesAsText`;
                 
                 const response = await fetch(endpoint, {
                     headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" }
                 });
 
-                if (!response.ok) throw new Error("Error fetching SharePoint");
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error en la respuesta de SharePoint: ${errorText}`);
+                }
                 
                 const data = await response.json();
-                allItemsData = data.value; // Guardamos en memoria
+                allItemsData = data.value; 
                 renderTable(allItemsData);
 
             } catch (error) {
                 console.error("Error trayendo datos:", error);
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error al cargar datos.</td></tr>`;
+                // Ahora el error mostrará en pantalla el mensaje técnico exacto para que sepamos por qué falla
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error al cargar datos: ${error.message}</td></tr>`;
             } finally {
                 document.getElementById('loadingSpinner').classList.add('hidden');
             }
@@ -305,7 +308,7 @@
         function renderTable(items) {
             const tbody = document.getElementById('tableBody');
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay elementos.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay elementos en esta lista.</td></tr>`;
                 return;
             }
 
@@ -313,23 +316,20 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors group';
                 
-                // MÁGIA DE LA API: Accedemos a la representación de texto de todas las columnas.
+                // MÁGIA DE LA API: Extraer el texto real de FieldValuesAsText (evita que salgan IDs como "2053")
                 const fv = item.FieldValuesAsText || {};
                 
-                // Extraemos la sucursal buscando el texto formateado
-                let sucursal = fv.Sucursal || item.Sucursal || item.OData_Sucursal || item.Title || 'N/A';
-                if (typeof sucursal === 'object' && sucursal !== null) { sucursal = sucursal.Title || sucursal.Label || sucursal.Value || 'N/A'; }
+                let sucursal = fv.Sucursal || item.Sucursal || item.Title || 'N/A';
+                if (typeof sucursal === 'object' && sucursal !== null) { sucursal = sucursal.Title || sucursal.Label || 'N/A'; }
                 
-                // Lo mismo con el usuario
-                let usuario = fv.Usuario_x0020_Declarante || fv.UsuarioDeclarante || item.Usuario_x0020_Declarante || item.UsuarioDeclarante || item.Author?.Title || 'Desconocido';
+                let usuario = fv.Usuario_x0020_Declarante || item.Usuario_x0020_Declarante || item.Author?.Title || 'Desconocido';
                 if (typeof usuario === 'object' && usuario !== null) { usuario = usuario.Title || usuario.Label || 'Desconocido'; }
                 
-                const rawFecha = fv.Fecha_x0020_Cierre || item.Fecha_x0020_Cierre || item.FechaCierre || item.Created;
+                const rawFecha = fv.Fecha_x0020_Cierre || item.Fecha_x0020_Cierre || item.Created;
                 const fecha = new Date(rawFecha).toLocaleDateString('es-ES');
                 
                 let estadoFiltro = fv.Estado || item.Estado || (currentList === 'CIERRES' ? 'En espera' : (currentList === 'Cierres Finalizados' ? 'Finalizado' : 'Rechazado'));
 
-                // Lógica de ícono de adjuntos
                 const tieneAdjuntos = item.AttachmentFiles && item.AttachmentFiles.length > 0;
                 const adjuntosHtml = tieneAdjuntos 
                     ? `<span class="inline-flex items-center gap-1 text-brand-light font-medium bg-blue-50 px-2 py-1 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${item.AttachmentFiles.length}</span>`
@@ -362,7 +362,6 @@
             
             const fv = item.FieldValuesAsText || {};
 
-            // Poblar textos básicos
             let sucursalStr = fv.Sucursal || item.Sucursal || item.Title || 'N/A';
             if(typeof sucursalStr === 'object') sucursalStr = sucursalStr.Title || sucursalStr.Label || 'N/A';
             
@@ -373,12 +372,10 @@
             document.getElementById('modalSucursal').innerText = sucursalStr;
             document.getElementById('modalUsuario').innerText = usuarioStr;
             
-            // Poblar Select e Inputs
-            document.getElementById('inputEstado').value = item.Estado || fv.Estado || 'En espera';
+            document.getElementById('inputEstado').value = fv.Estado || item.Estado || 'En espera';
             document.getElementById('inputObservaciones').value = fv.Observaciones || item.Observaciones || '';
             document.getElementById('inputComentarios').value = fv.Comentarios || item.Comentarios || '';
 
-            // Poblar Adjuntos
             const adjuntosContainer = document.getElementById('modalAdjuntos');
             adjuntosContainer.innerHTML = '';
             if(item.AttachmentFiles && item.AttachmentFiles.length > 0) {
@@ -419,7 +416,6 @@
                 
                 const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items(${currentEditingId})`;
                 
-                // NOTA IT: Hemos quitado "Observaciones" de aquí para que NO se mande a SharePoint y evitar sobrescrituras
                 const payload = {
                     Estado: document.getElementById('inputEstado').value,
                     Comentarios: document.getElementById('inputComentarios').value
