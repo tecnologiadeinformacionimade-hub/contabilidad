@@ -159,14 +159,20 @@
                         </select>
                     </div>
                     
+                    <!-- Campo Observaciones: Ahora es Solo Lectura (Readonly) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones (Usuario)</label>
-                        <textarea id="inputObservaciones" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe observaciones aquí..."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Observaciones <span class="text-xs font-normal text-gray-500">(Mensaje original del usuario declarante)</span>
+                        </label>
+                        <textarea id="inputObservaciones" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed outline-none" readonly placeholder="El usuario no dejó observaciones..."></textarea>
                     </div>
 
+                    <!-- Campo Comentarios: Aclarado su propósito -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Comentarios (IT / Contabilidad) - <span class="text-xs text-brand-light">Desencadena Correo</span></label>
-                        <textarea id="inputComentarios" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe un comentario. Al guardar, esto notificará por correo."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Comentarios de Resolución <span class="text-xs font-normal text-brand-light">(Se enviará por correo al usuario)</span>
+                        </label>
+                        <textarea id="inputComentarios" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-brand-light focus:border-brand-light outline-none transition" placeholder="Escribe aquí el motivo del rechazo o notas de finalización para notificar al usuario..."></textarea>
                     </div>
                 </div>
             </div>
@@ -396,9 +402,9 @@
                 
                 const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${currentList}')/items(${currentEditingId})`;
                 
+                // NOTA IT: Hemos quitado "Observaciones" de aquí para que NO se mande a SharePoint y evitar sobrescrituras
                 const payload = {
                     Estado: document.getElementById('inputEstado').value,
-                    Observaciones: document.getElementById('inputObservaciones').value,
                     Comentarios: document.getElementById('inputComentarios').value
                 };
 
