@@ -444,10 +444,7 @@
                 
                 <!-- Selector de Pestañas Estilo Apple Segmented Control -->
                 <div class="flex p-1 bg-gray-200/50 dark:bg-gray-800/50 backdrop-blur-md rounded-xl w-full lg:w-auto overflow-x-auto custom-scrollbar">
-                    <button onclick="changeTab('Todos')" id="tab-Todos" class="tab-btn active relative px-5 py-1.5 text-sm font-semibold rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm transition-all whitespace-nowrap">
-                        Todos
-                    </button>
-                    <button onclick="changeTab('En espera')" id="tab-En espera" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
+                    <button onclick="changeTab('En espera')" id="tab-En espera" class="tab-btn active relative px-5 py-1.5 text-sm font-semibold rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm transition-all whitespace-nowrap">
                         Pendientes
                         <span id="badge-pendientes" class="ml-1.5 bg-brand-blue text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
                     </button>
@@ -456,6 +453,9 @@
                     </button>
                     <button onclick="changeTab('Rechazado')" id="tab-Rechazado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
                         Rechazados
+                    </button>
+                    <button onclick="changeTab('Todos')" id="tab-Todos" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
+                        Todos
                     </button>
                 </div>
 
@@ -785,8 +785,9 @@
         const state = {
             items: [],
             filteredItems: [],
-            currentTab: 'Todos',
+            currentTab: 'En espera', // Se cambia por defecto a Pendientes
             currentEditingId: null,
+            currentEditingList: null,
             searchQuery: '',
             sortCol: 'FechaCierre',
             sortAsc: false,
@@ -806,6 +807,7 @@
             cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
         };
         const siteUrl = "https://grupoimade.sharepoint.com/sites/CONTABILIDAD_IMADE";
+        const baseDomainUrl = "https://grupoimade.sharepoint.com";
         const tokenRequest = { scopes: ["https://grupoimade.sharepoint.com/.default"] };
 
         let msalInstance;
@@ -1011,6 +1013,7 @@
             const sucursales = ['Agencia Central', 'Sucursal Norte', 'Plaza Financiera', 'Agencia Sur', 'Corporate Center', 'Agencia Este'];
             const declarantes = ['Ana Martínez', 'Carlos López', 'María José Fernández', 'Luis Pérez', 'Roberto Gómez', 'Elena Castillo'];
             const estados = ['En espera', 'Finalizado', 'Rechazado'];
+            const listMap = { 'En espera': 'CIERRES', 'Finalizado': 'Cierres Finalizados', 'Rechazado': 'Cierres Rechazados' };
             const obs = [
                 'Adjunto cierre del día. Todo cuadra.',
                 'Faltante de caja menor justificado en el adjunto.',
@@ -1038,15 +1041,18 @@
                     }
                 }
 
+                const estadoRandom = estados[Math.floor(Math.random() * estados.length)];
+
                 mock.push({
                     Id: 1000 + i,
                     FechaCierre: date.toISOString(),
                     _parsedSucursal: sucursales[Math.floor(Math.random() * sucursales.length)],
                     _parsedUsuario: declarantes[Math.floor(Math.random() * declarantes.length)],
-                    _parsedEstado: estados[Math.floor(Math.random() * estados.length)],
+                    _parsedEstado: estadoRandom,
                     _parsedObservaciones: obs[Math.floor(Math.random() * obs.length)],
                     _parsedComentarios: '',
-                    AttachmentFiles: attachments
+                    AttachmentFiles: attachments,
+                    _listName: listMap[estadoRandom]
                 });
             }
             return mock;
@@ -1058,6 +1064,77 @@
          * GESTIÓN DE DATOS (FETCH & PROCESAMIENTO)
          * ==========================================
          */
+        
+        // Nueva función genérica para obtener datos de una lista específica
+        async function fetchList(listName, defaultStatus, headers) {
+            try {
+                const fieldsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/Fields?$select=Title,InternalName,TypeAsString`;
+                const fieldsRes = await fetch(fieldsEndpoint, { headers });
+                
+                if (!fieldsRes.ok) {
+                    console.warn(`No se pudo leer la lista o no existe: ${listName}`);
+                    return []; // Ignoramos si la lista no existe en el sitio actual
+                }
+                
+                const fieldsData = await fieldsRes.json();
+
+                // Función auxiliar para mapear el título visual a su nombre interno de base de datos
+                const getIntName = (titles) => {
+                    const field = fieldsData.value.find(f => titles.some(t => f.Title.toLowerCase().includes(t.toLowerCase())));
+                    return field ? field.InternalName : null;
+                };
+
+                const intSucursal = getIntName(['Sucursal', 'Ubicaci', 'Agencia']);
+                const intDeclarante = getIntName(['Declarante', 'Usuario']);
+                const intEstado = getIntName(['Estado']);
+                const intObservaciones = getIntName(['Observacion']);
+                const intComentarios = getIntName(['Comentario']);
+
+                // Construir consulta segura
+                const fvtSelects = [];
+                if (intSucursal) fvtSelects.push(`FieldValuesAsText/${intSucursal}`);
+                if (intDeclarante) fvtSelects.push(`FieldValuesAsText/${intDeclarante}`);
+                if (intEstado) fvtSelects.push(`FieldValuesAsText/${intEstado}`);
+
+                const expandStr = `Author,AttachmentFiles${fvtSelects.length > 0 ? ',FieldValuesAsText' : ''}`;
+                const selectStr = `*,Author/Title${fvtSelects.length > 0 ? ',' + fvtSelects.join(',') : ''}`;
+                
+                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/items?$top=5000&$select=${selectStr}&$expand=${expandStr}`;
+
+                const res = await fetch(endpoint, { headers });
+                if (!res.ok) return [];
+                
+                const data = await res.json();
+                
+                // Mapear datos usando los nombres descubiertos dinámicamente
+                return data.value.map(item => {
+                    const fvt = item.FieldValuesAsText || {};
+                    let estadoVal = (intEstado && fvt[intEstado]) ? fvt[intEstado] : (item[intEstado] || item.Estado || '');
+                    
+                    // Asegurar que exista un estado por si la lista carece de dicha columna
+                    if(!estadoVal) estadoVal = defaultStatus;
+
+                    return {
+                        Id: item.Id,
+                        FechaCierre: item.Fecha_x0020_Cierre || item.FechaCierre || item.Created,
+                        _parsedSucursal: (intSucursal && fvt[intSucursal]) ? fvt[intSucursal] : (item[intSucursal] || item.Title || 'N/A'),
+                        _parsedUsuario: (intDeclarante && fvt[intDeclarante]) ? fvt[intDeclarante] : (item[intDeclarante] || item.Author?.Title || 'Desconocido'),
+                        _parsedEstado: estadoVal,
+                        _parsedObservaciones: (intObservaciones ? item[intObservaciones] : item.Observaciones) || '',
+                        _parsedComentarios: (intComentarios ? item[intComentarios] : item.Comentarios) || '',
+                        AttachmentFiles: item.AttachmentFiles || [],
+                        // Guardamos los nombres internos exactos para usarlos al guardar los cambios
+                        _intEstado: intEstado || 'Estado',
+                        _intComentarios: intComentarios || 'Comentarios',
+                        _listName: listName // Guardamos la lista de origen para poder guardar cambios ahí mismo
+                    };
+                });
+            } catch (error) {
+                console.warn(`Error al obtener datos de ${listName}:`, error);
+                return [];
+            }
+        }
+
         async function loadData(showToastMsg = false) {
             if(state.isDemoMode) {
                 if(showToastMsg) showToast("Datos sincronizados (Demo)", "success");
@@ -1074,65 +1151,20 @@
 
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
                 const headers = { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" };
-                const listName = 'CIERRES';
-
-                // 1. PASO CLAVE RESTAURADO: Obtener el diccionario de columnas de SharePoint
-                // Esto previene el error 400 OData si los nombres de columnas no coinciden.
-                const fieldsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/Fields?$select=Title,InternalName,TypeAsString`;
-                const fieldsRes = await fetch(fieldsEndpoint, { headers });
-                if (!fieldsRes.ok) throw new Error("No se pudo obtener el esquema de la lista.");
-                const fieldsData = await fieldsRes.json();
-
-                // Función auxiliar para mapear el título visual a su nombre interno de base de datos
-                const getIntName = (titles) => {
-                    const field = fieldsData.value.find(f => titles.some(t => f.Title.toLowerCase().includes(t.toLowerCase())));
-                    return field ? field.InternalName : null;
-                };
-
-                const intSucursal = getIntName(['Sucursal', 'Ubicaci', 'Agencia']);
-                const intDeclarante = getIntName(['Declarante', 'Usuario']);
-                const intEstado = getIntName(['Estado']);
-                const intObservaciones = getIntName(['Observacion']);
-                const intComentarios = getIntName(['Comentario']);
-
-                // 2. Construir consulta segura
-                const fvtSelects = [];
-                if (intSucursal) fvtSelects.push(`FieldValuesAsText/${intSucursal}`);
-                if (intDeclarante) fvtSelects.push(`FieldValuesAsText/${intDeclarante}`);
-                if (intEstado) fvtSelects.push(`FieldValuesAsText/${intEstado}`);
-
-                const expandStr = `Author,AttachmentFiles${fvtSelects.length > 0 ? ',FieldValuesAsText' : ''}`;
-                const selectStr = `*,Author/Title${fvtSelects.length > 0 ? ',' + fvtSelects.join(',') : ''}`;
                 
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/items?$top=5000&$select=${selectStr}&$expand=${expandStr}`;
+                // Fetch de las 3 listas simultáneamente usando Promise.all para ganar velocidad
+                const [pendientes, finalizados, rechazados] = await Promise.all([
+                    fetchList('CIERRES', 'En espera', headers),
+                    fetchList('Cierres Finalizados', 'Finalizado', headers),
+                    fetchList('Cierres Rechazados', 'Rechazado', headers)
+                ]);
 
-                const res = await fetch(endpoint, { headers });
-                if (!res.ok) {
-                    const errText = await res.text();
-                    throw new Error(`Error de SharePoint HTTP ${res.status}: ${errText}`);
+                // Juntar todos los items
+                state.items = [...pendientes, ...finalizados, ...rechazados];
+
+                if (state.items.length === 0) {
+                    throw new Error("No se obtuvieron registros de ninguna lista.");
                 }
-                
-                const data = await res.json();
-                
-                // 3. Mapear datos usando los nombres descubiertos dinámicamente
-                state.items = data.value.map(item => {
-                    const fvt = item.FieldValuesAsText || {};
-                    let estadoVal = (intEstado && fvt[intEstado]) ? fvt[intEstado] : (item[intEstado] || item.Estado || 'En espera');
-
-                    return {
-                        Id: item.Id,
-                        FechaCierre: item.Fecha_x0020_Cierre || item.FechaCierre || item.Created,
-                        _parsedSucursal: (intSucursal && fvt[intSucursal]) ? fvt[intSucursal] : (item[intSucursal] || item.Title || 'N/A'),
-                        _parsedUsuario: (intDeclarante && fvt[intDeclarante]) ? fvt[intDeclarante] : (item[intDeclarante] || item.Author?.Title || 'Desconocido'),
-                        _parsedEstado: estadoVal,
-                        _parsedObservaciones: (intObservaciones ? item[intObservaciones] : item.Observaciones) || '',
-                        _parsedComentarios: (intComentarios ? item[intComentarios] : item.Comentarios) || '',
-                        AttachmentFiles: item.AttachmentFiles || [],
-                        // Guardamos los nombres internos exactos para usarlos al guardar los cambios
-                        _intEstado: intEstado || 'Estado',
-                        _intComentarios: intComentarios || 'Comentarios'
-                    };
-                });
 
                 if(showToastMsg) showToast("Datos sincronizados con éxito desde SharePoint", "success");
                 processData();
@@ -1315,7 +1347,7 @@
                             ${renderStatusBadge(item._parsedEstado)}
                         </td>
                         <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap text-right">
-                            <button onclick="openModal(${item.Id})" class="apple-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-brand-blue hover:text-white dark:hover:bg-brand-blue transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Ver detalle">
+                            <button onclick="openModal(${item.Id}, '${item._listName}')" class="apple-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-brand-blue hover:text-white dark:hover:bg-brand-blue transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Ver detalle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </button>
                         </td>
@@ -1512,11 +1544,12 @@
          * MODALES Y FORMULARIOS
          * ==========================================
          */
-        function openModal(id) {
-            const item = state.items.find(i => i.Id === id);
+        function openModal(id, listName) {
+            const item = state.items.find(i => i.Id === id && (i._listName === listName || !listName));
             if(!item) return;
             
             state.currentEditingId = id;
+            state.currentEditingList = item._listName || 'CIERRES';
             
             // Llenar datos left column
             document.getElementById('modalId').innerText = item.Id;
@@ -1548,8 +1581,11 @@
             adjuntosContainer.innerHTML = '';
             if(item.AttachmentFiles && item.AttachmentFiles.length > 0) {
                 item.AttachmentFiles.forEach(file => {
+                    // USO DEL DOMINIO RAÍZ PARA EVITAR ERROR 404
+                    const attachUrl = state.isDemoMode ? '#' : `${baseDomainUrl}${file.ServerRelativeUrl}`;
+                    
                     adjuntosContainer.innerHTML += `
-                        <a href="${state.isDemoMode ? '#' : siteUrl + file.ServerRelativeUrl}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+                        <a href="${attachUrl}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
                             <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             </div>
@@ -1591,11 +1627,12 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
                 state.currentEditingId = null;
+                state.currentEditingList = null;
             }, 300);
         }
 
         async function saveItemChanges() {
-            if(!state.currentEditingId) return;
+            if(!state.currentEditingId || !state.currentEditingList) return;
             
             const btn = document.getElementById('btnSave');
             const spinner = document.getElementById('btnSaveSpinner');
@@ -1616,18 +1653,18 @@
                     await new Promise(r => setTimeout(r, 1000));
                     
                     // Actualizar estado local
-                    const itemIndex = state.items.findIndex(i => i.Id === state.currentEditingId);
+                    const itemIndex = state.items.findIndex(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
                     if(itemIndex > -1) {
                         state.items[itemIndex]._parsedEstado = nuevoEstado;
                         state.items[itemIndex]._parsedComentarios = nuevoComentario;
                     }
                 } else {
-                    // Llamada real a SharePoint
+                    // Llamada real a SharePoint a la lista correcta
                     const accounts = msalInstance.getAllAccounts();
                     const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
-                    const itemToUpdate = state.items.find(i => i.Id === state.currentEditingId);
+                    const itemToUpdate = state.items.find(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
                     
-                    const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('CIERRES')/items(${state.currentEditingId})`;
+                    const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${state.currentEditingList}')/items(${state.currentEditingId})`;
                     
                     // Usamos los nombres internos exactos descubiertos
                     const payload = {};
