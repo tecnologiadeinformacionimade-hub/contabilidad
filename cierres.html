@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestión de Cierres - Grupo Imade | Glass Edition</title>
-    
-    <!-- Fuentes de Apple (San Francisco) fallback a Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Gestión de Cierres - Grupo Imade | Apple Design</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +11,7 @@
     <!-- MSAL.js para Autenticación con Microsoft 365 -->
     <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
     
-    <!-- Configuración extendida de Tailwind para diseño Glass -->
+    <!-- Configuración Tailwind adaptada a Apple HIG -->
     <script>
         tailwind.config = {
             theme: {
@@ -25,49 +20,43 @@
                         sans: [
                             '-apple-system', 
                             'BlinkMacSystemFont', 
-                            '"SF Pro Text"', 
-                            '"Segoe UI"', 
-                            'Roboto', 
+                            '"SF Pro Display"',
+                            '"SF Pro Text"',
+                            '"Helvetica Neue"', 
                             'Helvetica', 
                             'Arial', 
                             'sans-serif'
                         ],
                     },
                     colors: {
-                        brand: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            200: '#bcccdc',
-                            300: '#9fb3c8',
-                            400: '#829ab1',
-                            500: '#627d98',
-                            600: '#486581',
-                            700: '#334e68',
-                            800: '#243b53',
-                            900: '#102a43',
-                            blue: '#007AFF', // Apple Blue
-                            dark: '#1C1C1E', // Apple Dark
-                            glass: 'rgba(255, 255, 255, 0.6)'
+                        apple: {
+                            bg: '#F5F5F7',
+                            card: '#FFFFFF',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            blue: '#007AFF',
+                            blueHover: '#0066CC',
+                            blueLight: '#E5F0FF',
+                            green: '#34C759',
+                            greenLight: '#E8F8F0',
+                            red: '#FF3B30',
+                            redLight: '#FFEBEB',
+                            orange: '#FF9500',
+                            border: '#E5E5EA',
+                            search: '#7676801F'
                         }
                     },
                     boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-                        'floating': '0 20px 40px -10px rgba(0,0,0,0.1)',
+                        'apple-soft': '0 4px 24px rgba(0, 0, 0, 0.04)',
+                        'apple-floating': '0 10px 40px rgba(0, 0, 0, 0.08)',
+                        'apple-btn': '0 2px 8px rgba(0, 122, 255, 0.3)',
                     },
                     animation: {
-                        'blob': 'blob 7s infinite',
-                        'fade-in': 'fadeIn 0.4s ease-out forwards',
-                        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'slide-in-right': 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        },
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
@@ -76,9 +65,9 @@
                             '0%': { opacity: '0', transform: 'translateY(20px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         },
-                        slideInRight: {
-                            '0%': { opacity: '0', transform: 'translateX(50px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
                         }
                     }
                 }
@@ -87,100 +76,85 @@
     </script>
     
     <style>
-        /* Estilos CSS Base y Utilidades de Glassmorphism */
-        :root {
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-blur: 20px;
-        }
-
+        /* Estilos CSS Base Apple */
         body {
-            background-color: #f5f5f7;
-            background-image: 
-                radial-gradient(at 40% 20%, hsla(210,100%,90%,1) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, hsla(189,100%,90%,1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, hsla(280,100%,90%,1) 0px, transparent 50%);
-            background-attachment: fixed;
+            background-color: #F5F5F7;
+            color: #1D1D1F;
             overflow-x: hidden;
-            transition: background-color 0.5s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Utilidad Principal Glassmorphism */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-        }
-
-        .glass-header {
-            background: rgba(255, 255, 255, 0.8);
+        /* Nav y Headers traslúcidos estilo macOS/iOS */
+        .apple-navbar {
+            background-color: rgba(255, 255, 255, 0.75);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
         }
 
-        .glass-input {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+        .apple-modal-bg {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: saturate(200%) blur(30px);
+            -webkit-backdrop-filter: saturate(200%) blur(30px);
         }
 
-        .glass-input:focus {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-            border-color: rgba(0, 122, 255, 0.5);
+        /* Inputs estilo iOS */
+        .apple-input {
+            background-color: #F2F2F7;
+            border: 1.5px solid transparent;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .apple-input:focus {
+            background-color: #FFFFFF;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+            outline: none;
         }
 
-        /* Scrollbars estilo macOS */
+        /* Buscador estilo SF */
+        .apple-search {
+            background-color: rgba(118, 118, 128, 0.12);
+            transition: background-color 0.2s;
+        }
+        .apple-search:focus-within {
+            background-color: rgba(118, 118, 128, 0.18);
+        }
+
+        /* Scrollbars minimalistas */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.25);
         }
 
-        /* Botones estilo Apple */
-        .apple-btn {
-            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .apple-btn:active {
+        /* Efectos de click estilo iOS */
+        .apple-active:active {
             transform: scale(0.96);
+            opacity: 0.8;
         }
 
-        /* Esqueletos de carga */
-        .skeleton {
-            background: linear-gradient(90deg, rgba(200,200,200,0.1) 25%, rgba(200,200,200,0.2) 37%, rgba(200,200,200,0.1) 63%);
-            background-size: 400% 100%;
-            animation: skeleton-loading 1.4s ease infinite;
-        }
-        @keyframes skeleton-loading {
-            0% { background-position: 100% 50%; }
-            100% { background-position: 0 50%; }
-        }
-
-        /* Checkbox Custom */
+        /* Checkbox Custom Apple */
         .apple-checkbox {
             appearance: none;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 1.5px solid #c7c7cc;
-            border-radius: 0.375rem;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #C7C7CC;
+            border-radius: 6px;
             background-color: transparent;
             display: inline-block;
             position: relative;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .apple-checkbox:checked {
             background-color: #007AFF;
@@ -191,98 +165,113 @@
             position: absolute;
             top: 2px;
             left: 6px;
-            width: 6px;
-            height: 11px;
+            width: 5px;
+            height: 10px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
         }
 
-        /* Efecto de modal */
-        .modal-overlay {
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            background-color: rgba(0,0,0,0.4);
+        /* Segmented Control de Apple */
+        .segmented-control {
+            background-color: rgba(118, 118, 128, 0.12);
+            padding: 2px;
+            border-radius: 8px;
+            display: inline-flex;
         }
+        .segmented-btn {
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            color: #1D1D1F;
+            transition: all 0.2s ease;
+        }
+        .segmented-btn.active {
+            background-color: #FFFFFF;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+        .segmented-btn:not(.active):hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Skeletons */
+        .skeleton {
+            background: linear-gradient(90deg, #E5E5EA 25%, #F2F2F7 37%, #E5E5EA 63%);
+            background-size: 400% 100%;
+            animation: skeleton-loading 1.4s ease infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        /* Loader Apple Spinner */
+        .apple-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(118, 118, 128, 0.2);
+            border-top-color: #86868B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
-<body class="text-gray-900 min-h-screen flex flex-col selection:bg-brand-blue selection:text-white relative">
+<body class="text-apple-text min-h-screen flex flex-col relative selection:bg-apple-blue selection:text-white">
 
     <!-- Global Loading Overlay -->
-    <div id="globalLoader" class="fixed inset-0 bg-gray-900/70 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center text-white transition-opacity duration-300 opacity-0">
-        <div class="relative w-24 h-24 mb-6 flex items-center justify-center">
-            <svg class="animate-spin absolute inset-0 w-full h-full text-brand-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-100 shadow-lg" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <div class="w-10 h-10 rounded-full bg-brand-blue shadow-lg absolute"></div>
-        </div>
-        <h3 class="text-2xl font-bold mb-2 tracking-tight">Sincronizando SharePoint</h3>
-        <p class="text-sm text-gray-300">Descargando últimos movimientos y expedientes...</p>
+    <div id="globalLoader" class="fixed inset-0 bg-white/60 backdrop-blur-xl z-[9999] hidden flex flex-col items-center justify-center text-apple-text transition-opacity duration-300 opacity-0">
+        <div class="apple-spinner mb-4"></div>
+        <h3 class="text-lg font-semibold tracking-tight">Sincronizando SharePoint</h3>
+        <p class="text-sm text-apple-textMuted mt-1">Un momento por favor...</p>
     </div>
 
-    <!-- Elementos Decorativos de Fondo (Blobs) -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-teal-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-    </div>
+    <!-- Contenedor de Notificaciones (Toasts) iOS Style -->
+    <div id="toastContainer" class="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none items-center w-full max-w-sm"></div>
 
-    <!-- Contenedor de Notificaciones (Toasts) -->
-    <div id="toastContainer" class="fixed top-20 right-4 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- Navegación Superior Estilo macOS -->
-    <nav class="glass-header sticky top-0 z-50 w-full transition-colors duration-300">
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+    <!-- Navegación Superior Apple -->
+    <nav class="apple-navbar sticky top-0 z-50 w-full transition-colors duration-300">
+        <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-14 items-center">
                 
                 <!-- Logo y Título -->
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-blue-600 shadow-md text-white font-bold text-xl">
+                <div class="flex items-center gap-3 cursor-default">
+                    <div class="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-bold text-lg shadow-sm">
                         I
                     </div>
-                    <div class="h-6 w-px bg-gray-300 hidden sm:block transition-colors"></div>
-                    <div class="flex flex-col">
-                        <h1 class="text-lg font-semibold tracking-tight leading-tight">Grupo Imade</h1>
-                        <span class="text-xs text-gray-500 font-medium">Gestor de Cierres Contables</span>
+                    <div class="flex flex-col justify-center">
+                        <h1 class="text-[15px] font-semibold tracking-tight leading-tight">Grupo Imade</h1>
+                        <span class="text-[11px] text-apple-textMuted font-medium leading-tight">Cierres Contables</span>
                     </div>
                 </div>
 
-                <!-- Barra de búsqueda rápida (Visible solo en desktop) -->
-                <div class="hidden md:flex flex-1 max-w-md mx-8 relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-brand-blue transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <!-- Barra de búsqueda rápida -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
-                    <input type="text" id="globalSearch" placeholder="Buscar por ID, Sucursal o Declarante... (Cmd+K)" 
-                        class="glass-input w-full pl-10 pr-4 py-2 rounded-full text-sm outline-none placeholder-gray-400 shadow-sm"
+                    <input type="text" id="globalSearch" placeholder="Buscar expedientes..." 
+                        class="apple-search w-full pl-9 pr-4 py-1.5 rounded-[10px] text-[13px] outline-none placeholder-gray-500 text-apple-text"
                         autocomplete="off">
                 </div>
 
                 <!-- Acciones de Usuario -->
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-4">
                     
                     <!-- Botón Regresar a Inicio -->
-                    <a href="inicio.html" class="apple-btn flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:bg-gray-100/80 transition-colors font-medium text-sm border border-transparent hover:border-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-                        <span class="hidden sm:inline">Regresar</span>
+                    <a href="inicio.html" class="apple-active flex items-center gap-1.5 text-apple-blue hover:opacity-80 transition-opacity font-medium text-[13px]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        <span class="hidden sm:inline">Inicio</span>
                     </a>
 
-                    <!-- Notificaciones -->
-                    <button class="apple-btn relative p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                    </button>
-
-                    <!-- Divisor -->
-                    <div class="h-6 w-px bg-gray-300 mx-1 transition-colors"></div>
-
                     <!-- Perfil de Usuario -->
-                    <div class="flex items-center gap-3 cursor-pointer group rounded-full pr-2 hover:bg-gray-100 transition-colors p-1" onclick="openSettingsModal()">
-                        <div id="userAvatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm skeleton">
-                            <!-- Initials inserted via JS -->
+                    <div class="flex items-center gap-2 cursor-pointer apple-active" onclick="openSettingsModal()">
+                        <div id="userAvatar" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-xs shadow-sm skeleton">
+                            <!-- Initials -->
                         </div>
-                        <div class="hidden md:flex flex-col">
-                            <span id="userNameDisplay" class="text-sm font-medium text-gray-700 leading-none mb-1">Cargando...</span>
-                            <span id="userRoleDisplay" class="text-[10px] text-gray-500 leading-none">Conectando</span>
-                        </div>
-                        <svg class="text-gray-400 group-hover:text-gray-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
 
                 </div>
@@ -292,365 +281,274 @@
 
     <!-- PANTALLA DE CARGA / VERIFICACIÓN INICIAL -->
     <div id="authLoadingScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in relative z-10">
-        <div class="glass-panel p-10 rounded-3xl flex flex-col items-center max-w-md w-full relative overflow-hidden">
-            <!-- Efecto de brillo interior -->
-            <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none"></div>
-            
-            <div class="relative w-20 h-20 mb-6 flex items-center justify-center">
-                <svg class="animate-spin absolute inset-0 w-full h-full text-brand-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-100 shadow-lg" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <div class="w-8 h-8 rounded-full bg-brand-blue shadow-lg absolute"></div>
-            </div>
-            
-            <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 mb-2">Iniciando Ecosistema</h2>
-            <p class="text-gray-500 text-sm mb-6">Conectando de forma segura con Microsoft 365...</p>
-            
-            <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-brand-blue h-1.5 rounded-full w-1/3 animate-pulse-slow relative">
-                    <div class="absolute inset-0 bg-white/30 skew-x-[-20deg] animate-[slideInRight_1s_infinite]"></div>
-                </div>
-            </div>
-
-            <p id="authFallbackMsg" class="text-xs text-gray-400 mt-6 hidden">
-                Si la conexión falla, se iniciará el Modo Demostración automáticamente.
-            </p>
-        </div>
+        <div class="apple-spinner mb-6"></div>
+        <h2 class="text-[22px] font-semibold tracking-tight mb-2">Conectando con Microsoft</h2>
+        <p class="text-[13px] text-apple-textMuted max-w-sm mx-auto">Verificando credenciales seguras para acceder al entorno de Grupo Imade.</p>
+        <p id="authFallbackMsg" class="text-[11px] text-apple-textMuted mt-8 hidden">Iniciando Modo Demostración automáticamente...</p>
     </div>
 
     <!-- CONTENIDO PRINCIPAL (DASHBOARD) -->
-    <main id="dashboardScreen" class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden relative z-10">
+    <main id="dashboardScreen" class="flex-1 max-w-[1200px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden relative z-10">
         
         <!-- Cabecera de Página -->
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 animate-slide-up">
             <div>
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900">Panel de Cierres</h2>
-                <p class="text-sm text-gray-500 mt-1">Supervisa, filtra y gestiona el flujo contable en tiempo real.</p>
+                <h2 class="text-[34px] font-bold tracking-tight text-apple-text leading-none">Cierres</h2>
+                <p class="text-[15px] text-apple-textMuted mt-2 font-medium">Gestión y revisión de flujo contable.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="exportToCSV()" class="apple-btn glass-panel px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/40 transition-colors flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Exportar CSV
+                <button onclick="exportToCSV()" class="apple-active bg-white border border-apple-border shadow-sm px-4 py-2 rounded-full text-[13px] font-semibold text-apple-text hover:bg-gray-50 transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Exportar
                 </button>
             </div>
         </div>
 
         <!-- Tarjetas Estadísticas (Widgets) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8 animate-slide-up" style="animation-delay: 0.1s;">
             
-            <!-- Widget Total -->
-            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity group-hover:scale-110 duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
-                </div>
-                <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Registros</p>
-                    <div class="flex items-end gap-3">
-                        <h3 id="statTotal" class="text-3xl font-bold text-gray-900">--</h3>
-                        <span class="text-xs font-medium text-green-500 bg-green-100 px-2 py-1 rounded-md mb-1">+12% este mes</span>
+            <div class="bg-white rounded-[20px] p-5 shadow-apple-soft border border-apple-border/50 flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                     </div>
+                </div>
+                <div>
+                    <h3 id="statTotal" class="text-[28px] font-semibold tracking-tight text-apple-text leading-none">--</h3>
+                    <p class="text-[13px] font-medium text-apple-textMuted mt-1">Total Expedientes</p>
                 </div>
             </div>
 
-            <!-- Widget En Espera -->
-            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group border-l-4 border-l-yellow-400">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-yellow-500 group-hover:scale-110 duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-                <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pendientes de Revisión</p>
-                    <div class="flex items-end gap-3">
-                        <h3 id="statPendiente" class="text-3xl font-bold text-gray-900">--</h3>
-                        <span class="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-md mb-1">Prioridad Alta</span>
+            <div class="bg-white rounded-[20px] p-5 shadow-apple-soft border border-apple-border/50 flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-apple-orange">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
+                </div>
+                <div>
+                    <h3 id="statPendiente" class="text-[28px] font-semibold tracking-tight text-apple-text leading-none">--</h3>
+                    <p class="text-[13px] font-medium text-apple-textMuted mt-1">En Revisión</p>
                 </div>
             </div>
 
-            <!-- Widget Finalizados -->
-            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group border-l-4 border-l-green-500">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-green-500 group-hover:scale-110 duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cierres Aprobados</p>
-                    <div class="flex items-end gap-3">
-                        <h3 id="statFinalizado" class="text-3xl font-bold text-gray-900">--</h3>
+            <div class="bg-white rounded-[20px] p-5 shadow-apple-soft border border-apple-border/50 flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-apple-green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
+                </div>
+                <div>
+                    <h3 id="statFinalizado" class="text-[28px] font-semibold tracking-tight text-apple-text leading-none">--</h3>
+                    <p class="text-[13px] font-medium text-apple-textMuted mt-1">Aprobados</p>
                 </div>
             </div>
 
-            <!-- Widget Rechazados -->
-            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group border-l-4 border-l-red-500">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-red-500 group-hover:scale-110 duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                </div>
-                <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Rechazados / Errores</p>
-                    <div class="flex items-end gap-3">
-                        <h3 id="statRechazado" class="text-3xl font-bold text-gray-900">--</h3>
-                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md mb-1">Requieren acción</span>
+            <div class="bg-white rounded-[20px] p-5 shadow-apple-soft border border-apple-border/50 flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-apple-red">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
+                </div>
+                <div>
+                    <h3 id="statRechazado" class="text-[28px] font-semibold tracking-tight text-apple-text leading-none">--</h3>
+                    <p class="text-[13px] font-medium text-apple-textMuted mt-1">Rechazados</p>
                 </div>
             </div>
 
         </div>
 
         <!-- Área Principal de la Tabla -->
-        <div class="glass-panel rounded-2xl shadow-glass border border-white/50 flex flex-col animate-slide-up" style="animation-delay: 0.2s; min-height: 500px;">
+        <div class="bg-white rounded-[24px] shadow-apple-soft border border-apple-border flex flex-col animate-slide-up overflow-hidden" style="animation-delay: 0.2s; min-height: 500px;">
             
-            <!-- Barra de Herramientas de la Tabla -->
-            <div class="p-4 sm:p-5 border-b border-gray-200/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative z-20">
+            <!-- Barra de Herramientas -->
+            <div class="px-6 py-4 border-b border-apple-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-white z-20">
                 
-                <!-- Selector de Pestañas Estilo Apple Segmented Control -->
-                <div class="flex p-1 bg-gray-200/50 backdrop-blur-md rounded-xl w-full lg:w-auto overflow-x-auto custom-scrollbar">
-                    <button onclick="changeTab('En espera')" id="tab-En espera" class="tab-btn active relative px-5 py-1.5 text-sm font-semibold rounded-lg text-gray-900 bg-white shadow-sm transition-all whitespace-nowrap">
-                        Pendientes
-                        <span id="badge-pendientes" class="ml-1.5 bg-brand-blue text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+                <!-- Segmented Control de Apple -->
+                <div class="segmented-control w-full sm:w-auto overflow-x-auto">
+                    <button onclick="changeTab('En espera')" id="tab-En espera" class="segmented-btn active whitespace-nowrap">
+                        Pendientes <span id="badge-pendientes" class="ml-1 text-[10px] text-apple-textMuted hidden">(0)</span>
                     </button>
-                    <button onclick="changeTab('Finalizado')" id="tab-Finalizado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
-                        Aprobados
-                    </button>
-                    <button onclick="changeTab('Rechazado')" id="tab-Rechazado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
-                        Rechazados
-                    </button>
-                    <button onclick="changeTab('Todos')" id="tab-Todos" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
-                        Todos
-                    </button>
+                    <button onclick="changeTab('Finalizado')" id="tab-Finalizado" class="segmented-btn whitespace-nowrap">Aprobados</button>
+                    <button onclick="changeTab('Rechazado')" id="tab-Rechazado" class="segmented-btn whitespace-nowrap">Rechazados</button>
+                    <button onclick="changeTab('Todos')" id="tab-Todos" class="segmented-btn whitespace-nowrap">Todos</button>
                 </div>
 
-                <!-- Controles a la derecha -->
-                <div class="flex items-center gap-3 w-full lg:w-auto">
-                    
-                    <!-- Simulación de acciones masivas -->
-                    <div id="bulkActions" class="hidden flex items-center gap-2 mr-2 animate-fade-in">
-                        <span class="text-xs font-medium text-gray-500"><span id="selectedCount">0</span> seleccionados</span>
-                        <button class="text-xs bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition-colors">Aprobar</button>
-                        <button class="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition-colors">Rechazar</button>
+                <!-- Acciones Masivas -->
+                <div class="flex items-center gap-3">
+                    <div id="bulkActions" class="hidden flex items-center gap-2 animate-fade-in bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+                        <span class="text-[11px] font-medium text-apple-textMuted mr-1"><span id="selectedCount">0</span> selec.</span>
+                        <button class="text-[11px] font-semibold text-apple-green hover:opacity-80 transition-opacity">Aprobar</button>
+                        <span class="text-gray-300">|</span>
+                        <button class="text-[11px] font-semibold text-apple-red hover:opacity-80 transition-opacity">Rechazar</button>
                     </div>
-
-                    <!-- Filtro extra -->
-                    <button class="apple-btn flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100/50 rounded-lg border border-gray-200/50 hover:bg-gray-200/50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                        <span class="hidden sm:inline">Filtros</span>
-                    </button>
                 </div>
             </div>
 
-            <!-- Contenedor de la Tabla -->
-            <div class="overflow-x-auto w-full flex-1 relative z-10 custom-scrollbar">
+            <!-- Tabla -->
+            <div class="overflow-x-auto w-full flex-1">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-50/50 backdrop-blur-md sticky top-0 z-20 shadow-sm">
+                    <thead class="bg-white border-b border-apple-border">
                         <tr>
-                            <th class="px-5 py-3 border-b border-gray-200 w-12 text-center">
+                            <th class="px-6 py-3 w-12 text-center">
                                 <input type="checkbox" id="selectAllCheckbox" class="apple-checkbox" onchange="toggleSelectAll(this)">
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Id')">
-                                <div class="flex items-center gap-1">
-                                    ID <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                </div>
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider cursor-pointer hover:bg-gray-50 transition-colors group" onclick="sortData('Id')">
+                                <div class="flex items-center gap-1">ID <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('FechaCierre')">
-                                <div class="flex items-center gap-1">
-                                    Fecha <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="FechaCierre" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                </div>
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider cursor-pointer hover:bg-gray-50 transition-colors group" onclick="sortData('FechaCierre')">
+                                <div class="flex items-center gap-1">Fecha <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="FechaCierre" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Sucursal')">
-                                <div class="flex items-center gap-1">
-                                    Sucursal <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Sucursal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                </div>
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider cursor-pointer hover:bg-gray-50 transition-colors group" onclick="sortData('Sucursal')">
+                                <div class="flex items-center gap-1">Sucursal <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Sucursal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Declarante')">
-                                <div class="flex items-center gap-1">
-                                    Declarante <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Declarante" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                </div>
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider cursor-pointer hover:bg-gray-50 transition-colors group" onclick="sortData('Declarante')">
+                                <div class="flex items-center gap-1">Declarante <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Declarante" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                                Adjuntos
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider text-center">Adjuntos</th>
+                            <th class="px-4 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider text-center cursor-pointer hover:bg-gray-50 transition-colors group" onclick="sortData('Estado')">
+                                <div class="flex items-center justify-center gap-1">Estado <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Estado" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Estado')">
-                                <div class="flex items-center justify-center gap-1">
-                                    Estado <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Estado" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                </div>
-                            </th>
-                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                Acciones
-                            </th>
+                            <th class="px-6 py-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider text-right">Acción</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="divide-y divide-gray-100 bg-white/30">
+                    <tbody id="tableBody" class="divide-y divide-gray-100 bg-white">
                         <!-- Skeletons iniciales -->
-                        <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
-                        <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
-                        <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
-                        <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
-                        <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
+                        <tr><td colspan="8" class="px-6 py-4"><div class="h-6 skeleton rounded-md w-full"></div></td></tr>
+                        <tr><td colspan="8" class="px-6 py-4"><div class="h-6 skeleton rounded-md w-full"></div></td></tr>
+                        <tr><td colspan="8" class="px-6 py-4"><div class="h-6 skeleton rounded-md w-full"></div></td></tr>
+                        <tr><td colspan="8" class="px-6 py-4"><div class="h-6 skeleton rounded-md w-full"></div></td></tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Paginación -->
-            <div class="p-4 border-t border-gray-200/50 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-b-2xl">
-                <span class="text-sm text-gray-500 font-medium" id="paginationInfo">Mostrando <span class="font-bold text-gray-900">0</span> a <span class="font-bold text-gray-900">0</span> de <span class="font-bold text-gray-900">0</span> registros</span>
+            <div class="px-6 py-4 border-t border-apple-border bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span class="text-[13px] text-apple-textMuted" id="paginationInfo">Mostrando <span class="font-semibold text-apple-text">0</span> a <span class="font-semibold text-apple-text">0</span> de <span class="font-semibold text-apple-text">0</span></span>
                 
                 <div class="flex items-center gap-2">
-                    <button onclick="changePage(-1)" id="btnPrevPage" class="apple-btn p-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <button onclick="changePage(-1)" id="btnPrevPage" class="apple-active w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
                     <div id="pageNumbers" class="flex items-center gap-1 hidden sm:flex">
-                        <!-- Números inyectados vía JS -->
+                        <!-- JS inject -->
                     </div>
-                    <button onclick="changePage(1)" id="btnNextPage" class="apple-btn p-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    <button onclick="changePage(1)" id="btnNextPage" class="apple-active w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Pie de página integrado -->
-        <footer class="mt-12 mb-6 text-center text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-center gap-2 animate-fade-in">
-            <span>&copy; 2026 Grupo Imade. Todos los derechos reservados.</span>
-            <span class="hidden sm:inline">•</span>
-            <span class="flex items-center gap-1">Diseñado con <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> y Glassmorphism</span>
+        <footer class="mt-12 mb-6 text-center text-[12px] text-apple-textMuted font-medium animate-fade-in">
+            &copy; 2026 Grupo Imade. Todos los derechos reservados.
         </footer>
 
     </main>
 
     <!-- ========================================== -->
-    <!-- MODALES (GLASSMORPHISM)                    -->
+    <!-- MODALES (APPLE STYLE)                      -->
     <!-- ========================================== -->
 
     <!-- MODAL DE EDICIÓN Y DETALLE -->
     <div id="editModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
-        <!-- Backdrop Blur -->
-        <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeModal()"></div>
         
-        <!-- Contenido del Modal -->
-        <div class="glass-panel rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300 border border-white/40" id="editModalContent">
+        <div class="bg-white rounded-[2rem] shadow-apple-floating w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300 border border-gray-200/50" id="editModalContent">
             
-            <!-- Header del Modal -->
-            <div class="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center glass-header relative z-10">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900 leading-tight">Expediente #<span id="modalId">--</span></h3>
-                        <p class="text-xs text-gray-500 font-medium">Revisión contable</p>
-                    </div>
+            <!-- Header Modal -->
+            <div class="px-8 py-5 border-b border-apple-border flex justify-between items-center bg-white/90 backdrop-blur-xl z-10 sticky top-0">
+                <div>
+                    <h3 class="text-[22px] font-bold text-apple-text tracking-tight leading-none">Expediente #<span id="modalId">--</span></h3>
                 </div>
-                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
-            <!-- Cuerpo Dividido -->
-            <div class="flex flex-col md:flex-row flex-1 overflow-hidden bg-white/40">
+            <!-- Contenido Modal -->
+            <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
                 
-                <!-- Columna Izquierda: Información de solo lectura -->
-                <div class="w-full md:w-5/12 p-6 border-r border-gray-200/50 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative">
+                <!-- Col Izq: Info -->
+                <div class="w-full md:w-5/12 p-8 border-r border-apple-border overflow-y-auto custom-scrollbar bg-[#F5F5F7]/50 flex flex-col gap-8">
                     
-                    <!-- Tarjeta de Info Principal -->
-                    <div class="bg-white/60 rounded-2xl p-5 border border-white/50 shadow-sm backdrop-blur-md">
-                        <div class="grid grid-cols-1 gap-5">
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                    Sucursal / Agencia
-                                </p>
-                                <p id="modalSucursal" class="text-base font-semibold text-gray-900">--</p>
-                            </div>
-                            
-                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-1.5">Sucursal</p>
+                            <p id="modalSucursal" class="text-[15px] font-semibold text-apple-text">--</p>
+                        </div>
+                        
+                        <div class="h-px w-full bg-gray-200"></div>
 
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    Usuario Declarante
-                                </p>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <div id="modalAvatar" class="w-8 h-8 rounded-full bg-blue-100 text-brand-blue flex items-center justify-center font-bold text-xs">--</div>
-                                    <p id="modalUsuario" class="text-sm font-medium text-gray-900">--</p>
-                                </div>
+                        <div>
+                            <p class="text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-1.5">Usuario Declarante</p>
+                            <div class="flex items-center gap-3">
+                                <div id="modalAvatar" class="w-8 h-8 rounded-full bg-blue-100 text-apple-blue flex items-center justify-center font-bold text-xs">--</div>
+                                <p id="modalUsuario" class="text-[15px] font-medium text-apple-text">--</p>
                             </div>
-                            
-                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-                            
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    Fecha Registro
-                                </p>
-                                <p id="modalFecha" class="text-sm font-medium text-gray-800">--</p>
-                            </div>
+                        </div>
+                        
+                        <div class="h-px w-full bg-gray-200"></div>
+                        
+                        <div>
+                            <p class="text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-1.5">Fecha Registro</p>
+                            <p id="modalFecha" class="text-[14px] font-medium text-gray-700">--</p>
                         </div>
                     </div>
 
-                    <!-- Archivos Adjuntos -->
+                    <!-- Adjuntos -->
                     <div>
-                        <h4 class="text-xs font-bold text-gray-800 mb-3 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                            Evidencia Adjunta
-                        </h4>
+                        <p class="text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-3">Documentos Adjuntos</p>
                         <div id="modalAdjuntos" class="flex flex-col gap-2">
-                            <!-- Inyectado via JS -->
+                            <!-- Inyectado JS -->
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Columna Derecha: Formularios de Edición -->
-                <div class="w-full md:w-7/12 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5 bg-gradient-to-b from-transparent to-gray-50/30">
+                <!-- Col Der: Edición -->
+                <div class="w-full md:w-7/12 p-8 overflow-y-auto custom-scrollbar flex flex-col gap-6 bg-white">
                     
                     <!-- Estado -->
-                    <div class="glass-panel p-1 rounded-xl flex items-center relative overflow-hidden bg-white/50">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-blue rounded-l-xl"></div>
-                        <label class="px-4 text-sm font-semibold text-gray-700 w-1/3">Dictamen</label>
-                        <select id="inputEstado" class="w-2/3 bg-transparent border-none focus:ring-0 text-sm font-medium py-3 px-2 outline-none text-gray-900 cursor-pointer appearance-none">
-                            <option value="En espera" class="text-black">⏳ En espera (Revisión)</option>
-                            <option value="Finalizado" class="text-black">✅ Aprobado / Finalizado</option>
-                            <option value="Rechazado" class="text-black">❌ Rechazado / Corrección</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[13px] font-semibold text-apple-text">Dictamen de Revisión</label>
+                        <div class="relative">
+                            <select id="inputEstado" class="apple-input w-full rounded-xl py-3 px-4 text-[15px] font-medium text-apple-text cursor-pointer appearance-none">
+                                <option value="En espera">⏳ En espera (Revisión)</option>
+                                <option value="Finalizado">✅ Aprobado / Finalizado</option>
+                                <option value="Rechazado">❌ Rechazado / Corrección</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Observaciones Originales -->
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-600 mb-2 flex justify-between">
-                            Mensaje del Remitente
-                            <span class="text-[10px] font-normal text-gray-400">Solo lectura</span>
-                        </label>
-                        <div class="relative">
-                            <div class="absolute top-3 left-3 text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            </div>
-                            <textarea id="inputObservaciones" rows="3" class="w-full glass-input rounded-xl pl-10 pr-4 py-3 text-sm text-gray-600 resize-none cursor-not-allowed opacity-80" readonly></textarea>
-                        </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[13px] font-semibold text-apple-textMuted">Mensaje del Remitente</label>
+                        <textarea id="inputObservaciones" rows="3" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-[14px] text-gray-600 resize-none cursor-not-allowed" readonly></textarea>
                     </div>
 
-                    <!-- Comentarios de Resolución -->
-                    <div class="flex flex-col flex-1">
-                        <label class="text-xs font-semibold text-gray-800 mb-2 flex justify-between items-center">
-                            Resolución Oficial
-                            <span class="bg-blue-100 text-brand-blue text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/><path d="m22 7-8.9 7-3.1-3.1"/><path d="m16 19 2 2 4-4"/></svg>
-                                Se notificará
-                            </span>
+                    <!-- Comentarios -->
+                    <div class="flex flex-col gap-2 flex-1">
+                        <label class="text-[13px] font-semibold text-apple-text flex justify-between items-center">
+                            Resolución
+                            <span class="text-[11px] font-normal text-apple-textMuted">El usuario será notificado</span>
                         </label>
-                        <textarea id="inputComentarios" rows="4" class="w-full glass-input rounded-xl p-4 text-sm text-gray-900 resize-none shadow-inner flex-1 min-h-[120px]" placeholder="Escribe el motivo del cambio de estado, instrucciones para corregir o confirmación..."></textarea>
+                        <textarea id="inputComentarios" rows="4" class="w-full apple-input rounded-xl px-4 py-3 text-[15px] text-apple-text resize-none flex-1 min-h-[120px]" placeholder="Escribe instrucciones o motivo de la resolución..."></textarea>
                     </div>
 
                 </div>
             </div>
 
-            <!-- Footer del Modal (Botones) -->
-            <div class="px-6 py-4 border-t border-gray-200/50 glass-header flex justify-end gap-3 z-10 relative">
-                <button onclick="closeModal()" class="apple-btn px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white/50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors">
+            <!-- Footer Modal -->
+            <div class="px-8 py-5 border-t border-apple-border bg-gray-50/80 flex justify-end gap-3 z-10">
+                <button onclick="closeModal()" class="apple-active px-6 py-2.5 text-[14px] font-semibold text-apple-blue bg-apple-blueLight hover:bg-[#D0E3FF] rounded-full transition-colors">
                     Cancelar
                 </button>
-                <button onclick="saveItemChanges()" id="btnSave" class="apple-btn px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-blue to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2">
+                <button onclick="saveItemChanges()" id="btnSave" class="apple-active px-6 py-2.5 text-[14px] font-semibold text-white bg-apple-blue hover:bg-apple-blueHover rounded-full transition-colors shadow-apple-btn flex items-center gap-2">
                     <span id="btnSaveText">Guardar Dictamen</span>
-                    <svg id="btnSaveSpinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <svg id="btnSaveIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+                    <svg id="btnSaveSpinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-100" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </button>
             </div>
         </div>
@@ -658,41 +556,37 @@
 
     <!-- MODAL DE CONFIGURACIÓN -->
     <div id="settingsModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 modal-overlay" onclick="closeSettingsModal()"></div>
-        <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative flex flex-col transform scale-95 transition-transform duration-300" id="settingsModalContent">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
+        <div class="bg-white rounded-3xl shadow-apple-floating w-full max-w-sm overflow-hidden relative flex flex-col transform scale-95 transition-transform duration-300" id="settingsModalContent">
             
-            <div class="px-5 py-4 border-b border-gray-200/50 flex justify-between items-center">
-                <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
-                    <svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Ajustes de Cuenta
-                </h3>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <div class="px-6 py-4 border-b border-apple-border flex justify-between items-center">
+                <h3 class="text-[17px] font-semibold tracking-tight text-apple-text">Ajustes</h3>
+                <button onclick="closeSettingsModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             
-            <div class="px-5 py-6 bg-white/30">
+            <div class="px-6 py-6">
                 <div class="flex flex-col items-center justify-center mb-6">
-                    <div id="settingsAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg mb-3">
+                    <div id="settingsAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-2xl shadow-sm mb-3">
                         U
                     </div>
-                    <p id="settingsName" class="font-bold text-gray-900">Usuario</p>
-                    <p id="settingsEmail" class="text-xs text-gray-500">usuario@grupoimade.com</p>
+                    <p id="settingsName" class="font-semibold text-[17px] tracking-tight">Usuario</p>
+                    <p id="settingsEmail" class="text-[13px] text-apple-textMuted">usuario@grupoimade.com</p>
                 </div>
 
-                <div class="space-y-2 mb-6">
-                    <div class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-gray-100">
-                        <span class="text-sm font-medium">Notificaciones de correo</span>
-                        <input type="checkbox" class="apple-checkbox" checked>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-gray-100">
-                        <span class="text-sm font-medium">Modo Demo (Pruebas)</span>
+                <div class="bg-gray-50 rounded-2xl p-2 mb-6">
+                    <div class="flex items-center justify-between p-3 border-b border-gray-200/50">
+                        <span class="text-[14px] font-medium">Modo Pruebas (Demo)</span>
                         <input type="checkbox" id="demoModeToggle" class="apple-checkbox" onchange="toggleDemoMode()">
                     </div>
+                    <div class="flex items-center justify-between p-3">
+                        <span class="text-[14px] font-medium">Notificaciones por correo</span>
+                        <input type="checkbox" class="apple-checkbox" checked>
+                    </div>
                 </div>
 
-                <button onclick="openLogoutConfirmModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-red-200 rounded-xl text-red-600 bg-red-50/50 hover:bg-red-100 transition-colors shadow-sm font-semibold text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <button onclick="openLogoutConfirmModal()" class="apple-active w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-apple-red bg-apple-redLight hover:opacity-80 transition-opacity font-semibold text-[15px]">
                     Cerrar Sesión de Microsoft
                 </button>
             </div>
@@ -701,25 +595,24 @@
 
     <!-- MODAL DE CONFIRMACIÓN SALIR -->
     <div id="logoutConfirmModal" class="fixed inset-0 z-[120] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 modal-overlay" onclick="closeLogoutConfirmModal()"></div>
-        <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative text-center p-6 transform scale-95 transition-transform duration-300 border border-red-500/30" id="logoutConfirmContent">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeLogoutConfirmModal()"></div>
+        <div class="bg-white rounded-[24px] shadow-apple-floating w-full max-w-[320px] overflow-hidden relative text-center p-6 transform scale-95 transition-transform duration-300" id="logoutConfirmContent">
             
-            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 relative">
-                <div class="absolute inset-0 rounded-full animate-ping bg-red-400 opacity-20"></div>
-                <svg class="text-red-500 relative z-10" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="w-14 h-14 rounded-full bg-apple-redLight flex items-center justify-center mx-auto mb-4">
+                <svg class="text-apple-red" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             
-            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Cerrar sesión?</h3>
-            <p class="text-sm text-gray-500 mb-6 leading-relaxed">
-                Desconectarás tu cuenta del Tenant de Microsoft. Perderás el acceso a la conexión API de SharePoint hasta que vuelvas a autenticarte.
+            <h3 class="text-[19px] font-semibold tracking-tight text-apple-text mb-2">¿Cerrar sesión?</h3>
+            <p class="text-[13px] text-apple-textMuted mb-6 leading-relaxed">
+                Perderás el acceso a la conexión segura de SharePoint hasta que vuelvas a autenticarte con Microsoft 365.
             </p>
             
-            <div class="flex flex-col gap-3">
-                <button onclick="signOut()" class="apple-btn w-full px-4 py-3 text-sm font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 shadow-md shadow-red-500/20 transition-all">
-                    Sí, Desconectar
+            <div class="flex flex-col gap-2">
+                <button onclick="signOut()" class="apple-active w-full px-4 py-3 text-[15px] font-semibold text-white bg-apple-red rounded-xl hover:opacity-90 transition-opacity">
+                    Desconectar
                 </button>
-                <button onclick="closeLogoutConfirmModal()" class="apple-btn w-full px-4 py-3 text-sm font-semibold text-gray-700 bg-white/50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-                    Mantener Sesión
+                <button onclick="closeLogoutConfirmModal()" class="apple-active w-full px-4 py-3 text-[15px] font-semibold text-apple-blue bg-apple-bg rounded-xl hover:bg-gray-200 transition-colors">
+                    Cancelar
                 </button>
             </div>
         </div>
@@ -729,17 +622,10 @@
     <!-- LÓGICA DE APLICACIÓN (JAVASCRIPT)          -->
     <!-- ========================================== -->
     <script>
-        /**
-         * ==========================================
-         * CONFIGURACIÓN E INICIALIZACIÓN
-         * ==========================================
-         */
-        
-        // Estado Global de la App
         const state = {
             items: [],
             filteredItems: [],
-            currentTab: 'En espera', // Se cambia por defecto a Pendientes
+            currentTab: 'En espera',
             currentEditingId: null,
             currentEditingList: null,
             searchQuery: '',
@@ -748,10 +634,9 @@
             page: 1,
             itemsPerPage: 10,
             isDemoMode: false,
-            user: { name: 'Usuario Prueba', email: 'demo@imade.com' }
+            user: { name: 'Usuario', email: 'mail@imade.com' }
         };
 
-        // Configuración de MSAL IT
         const msalConfig = {
             auth: {
                 clientId: "4d1a060b-c2b6-4214-8bb5-c2639e627b74", 
@@ -766,30 +651,20 @@
 
         let msalInstance;
 
-        // Inicialización principal
         window.onload = async () => {
             setupEventListeners();
-            
             try {
-                // Initialize MSAL carefully (won't throw if script fails to load, handled via try-catch)
                 msalInstance = new msal.PublicClientApplication(msalConfig);
                 await initializeAuth();
             } catch (e) {
-                console.warn("MSAL no pudo inicializarse correctamente. Forzando Modo Demo.", e);
                 enableDemoMode();
             }
         };
 
-        /**
-         * ==========================================
-         * UI UTILS
-         * ==========================================
-         */
-
+        // --- UI Utils ---
         function showLoader() {
             const loader = document.getElementById('globalLoader');
             loader.classList.remove('hidden');
-            // Trigger reflow to ensure animation runs
             void loader.offsetWidth;
             loader.classList.remove('opacity-0');
         }
@@ -797,67 +672,52 @@
         function hideLoader() {
             const loader = document.getElementById('globalLoader');
             loader.classList.add('opacity-0');
-            setTimeout(() => {
-                loader.classList.add('hidden');
-            }, 300);
+            setTimeout(() => loader.classList.add('hidden'), 300);
         }
 
-        function showToast(message, type = 'success', duration = 4000) {
+        function showToast(message, type = 'success', duration = 3000) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             
-            const colors = {
-                success: 'bg-white border-green-500 border-l-4 text-gray-800',
-                error: 'bg-white border-red-500 border-l-4 text-gray-800',
-                info: 'bg-white border-blue-500 border-l-4 text-gray-800'
-            };
-
+            // iOS style pill toast
             const icons = {
-                success: `<svg class="text-green-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-                error: `<svg class="text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-                info: `<svg class="text-blue-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+                success: `<svg class="text-white bg-apple-green rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+                error: `<svg class="text-white bg-apple-red rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+                info: `<svg class="text-white bg-apple-blue rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
             };
 
-            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-floating ${colors[type]} transform translate-x-full transition-transform duration-300 opacity-0 min-w-[300px] max-w-sm border border-gray-100 pointer-events-auto`;
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-full shadow-apple-floating bg-white/90 backdrop-blur-xl border border-gray-100 transform -translate-y-full opacity-0 transition-all duration-400 ease-out z-[9999]`;
             toast.innerHTML = `
                 ${icons[type]}
-                <span class="text-sm font-medium flex-1 break-words">${message}</span>
-                <button class="text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
+                <span class="text-[14px] font-medium text-apple-text tracking-tight pr-2">${message}</span>
             `;
             
             container.appendChild(toast);
             
-            // Force browser reflow to ensure the translate-x-full is applied BEFORE transitioning
+            // Force reflow for animation
             void toast.offsetWidth;
             
-            // Start transition
-            toast.classList.remove('translate-x-full', 'opacity-0');
+            // Slide down
+            toast.classList.remove('-translate-y-full', 'opacity-0');
+            toast.classList.add('translate-y-4', 'opacity-100'); // small margin from top
 
-            // Remove after duration
             setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
-                setTimeout(() => toast.remove(), 300); // wait for exit animation
+                toast.classList.remove('translate-y-4', 'opacity-100');
+                toast.classList.add('-translate-y-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 400); 
             }, duration);
         }
 
-        // Obtener iniciales para avatar
         function getInitials(name) {
             if(!name) return "U";
             return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
         }
 
-        /**
-         * ==========================================
-         * AUTENTICACIÓN
-         * ==========================================
-         */
+        // --- Auth ---
         async function initializeAuth() {
             try {
-                // Timeout para no quedarse pillado si MSAL no responde
                 const authPromise = new Promise(async (resolve, reject) => {
-                    const timer = setTimeout(() => reject(new Error("Timeout de autenticación de MSAL")), 5000);
+                    const timer = setTimeout(() => reject(new Error("Timeout")), 5000);
                     try {
                         const response = await msalInstance.handleRedirectPromise();
                         clearTimeout(timer);
@@ -877,7 +737,6 @@
                     const currentAccounts = msalInstance.getAllAccounts();
                     if (currentAccounts.length === 0) {
                         document.getElementById('authFallbackMsg').classList.remove('hidden');
-                        // Intenta login, si el entorno bloquea redirecciones fallará y pasará al catch
                         msalInstance.loginRedirect(tokenRequest); 
                     } else {
                         handleUIUpdate(currentAccounts[0]);
@@ -885,7 +744,6 @@
                     }
                 }
             } catch (error) {
-                console.error("Error en auth o entorno bloqueado:", error);
                 enableDemoMode();
             }
         }
@@ -893,20 +751,13 @@
         function handleUIUpdate(account) {
             if (account) {
                 state.user = { name: account.name, email: account.username };
-                
                 document.getElementById('authLoadingScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                
-                document.getElementById('userNameDisplay').innerText = state.user.name;
-                document.getElementById('userRoleDisplay').innerText = "Finanzas Imade";
-                document.getElementById('userRoleDisplay').classList.remove('text-gray-500');
-                document.getElementById('userRoleDisplay').classList.add('text-brand-blue');
                 
                 const avatarDiv = document.getElementById('userAvatar');
                 avatarDiv.innerText = getInitials(state.user.name);
                 avatarDiv.classList.remove('skeleton');
 
-                // Settings modal updates
                 document.getElementById('settingsName').innerText = state.user.name;
                 document.getElementById('settingsEmail').innerText = state.user.email;
                 document.getElementById('settingsAvatar').innerText = getInitials(state.user.name);
@@ -914,218 +765,116 @@
         }
 
         function signOut() { 
-            if(state.isDemoMode) {
-                location.reload();
-                return;
-            }
+            if(state.isDemoMode) { location.reload(); return; }
             sessionStorage.clear(); 
             try { msalInstance.logoutRedirect(); } catch(e) { location.reload(); }
         }
 
-        /**
-         * ==========================================
-         * MODO DEMO / FALLBACK
-         * ==========================================
-         */
+        // --- Demo Mode ---
         function enableDemoMode() {
             state.isDemoMode = true;
             document.getElementById('demoModeToggle').checked = true;
-            
-            // Simular usuario
-            handleUIUpdate({ name: "Demo User", username: "demo@grupoimade.com" });
-            
-            // Generar 50 registros falsos muy realistas
-            state.items = generateMockData(50);
-            
-            // Ocultar spinner inicial si lo hay
+            handleUIUpdate({ name: "Jefe Contabilidad", username: "demo@grupoimade.com" });
+            state.items = generateMockData(45);
             document.getElementById('authLoadingScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
-            
             processData();
         }
 
         function toggleDemoMode() {
-            const isChecked = document.getElementById('demoModeToggle').checked;
-            if(isChecked) {
+            if(document.getElementById('demoModeToggle').checked) {
                 enableDemoMode();
-                showToast("Modo Demostración activado manualmente.", "info");
+                showToast("Modo Demostración", "info");
             } else {
-                location.reload(); // Recargar para forzar auth real
+                location.reload();
             }
         }
 
         function generateMockData(count) {
-            const sucursales = ['Agencia Central', 'Sucursal Norte', 'Plaza Financiera', 'Agencia Sur', 'Corporate Center', 'Agencia Este'];
-            const declarantes = ['Ana Martínez', 'Carlos López', 'María José Fernández', 'Luis Pérez', 'Roberto Gómez', 'Elena Castillo'];
+            const sucursales = ['Agencia Central', 'Sucursal Norte', 'Plaza Financiera', 'Agencia Sur', 'Corporate Center'];
+            const declarantes = ['Ana Martínez', 'Carlos López', 'María José', 'Luis Pérez', 'Roberto Gómez'];
             const estados = ['En espera', 'Finalizado', 'Rechazado'];
             const listMap = { 'En espera': 'CIERRES', 'Finalizado': 'Cierres Finalizados', 'Rechazado': 'Cierres Rechazados' };
-            const obs = [
-                'Adjunto cierre del día. Todo cuadra.',
-                'Faltante de caja menor justificado en el adjunto.',
-                'Cierre con sobrante, pendiente revisión del supervisor.',
-                'Se envían comprobantes de pago atrasados.',
-                'Sistema caído durante 2h, cierre manual.',
-                ''
-            ];
-
             const mock = [];
             for (let i = 0; i < count; i++) {
-                // Fechas aleatorias de los últimos 30 días
                 const date = new Date();
-                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-                
-                const attachments = [];
-                const hasAttach = Math.random() > 0.3;
-                if(hasAttach) {
-                    const numAttach = Math.floor(Math.random() * 3) + 1;
-                    for(let j=0; j<numAttach; j++) {
-                        attachments.push({
-                            FileName: `Reporte_${j+1}.pdf`,
-                            ServerRelativeUrl: '#'
-                        });
-                    }
-                }
-
-                const estadoRandom = estados[Math.floor(Math.random() * estados.length)];
-
+                date.setDate(date.getDate() - Math.floor(Math.random() * 20));
+                const att = Math.random() > 0.4 ? [{FileName: `Cierre_${i}.pdf`, ServerRelativeUrl: '#'}] : [];
+                const est = estados[Math.floor(Math.random() * estados.length)];
                 mock.push({
-                    Id: 1000 + i,
+                    Id: 2000 + i,
                     FechaCierre: date.toISOString(),
                     _parsedSucursal: sucursales[Math.floor(Math.random() * sucursales.length)],
                     _parsedUsuario: declarantes[Math.floor(Math.random() * declarantes.length)],
-                    _parsedEstado: estadoRandom,
-                    _parsedObservaciones: obs[Math.floor(Math.random() * obs.length)],
+                    _parsedEstado: est,
+                    _parsedObservaciones: 'Adjunto documentos para revisión.',
                     _parsedComentarios: '',
-                    AttachmentFiles: attachments,
-                    _listName: listMap[estadoRandom]
+                    AttachmentFiles: att,
+                    _listName: listMap[est]
                 });
             }
             return mock;
         }
 
-
-        /**
-         * ==========================================
-         * GESTIÓN DE DATOS (FETCH & PROCESAMIENTO)
-         * ==========================================
-         */
-        
-        // Nueva función genérica para obtener datos de una lista específica
+        // --- Data Fetching ---
         async function fetchList(listName, defaultStatus, headers) {
             try {
-                const fieldsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/Fields?$select=Title,InternalName,TypeAsString`;
-                const fieldsRes = await fetch(fieldsEndpoint, { headers });
-                
-                if (!fieldsRes.ok) {
-                    console.warn(`No se pudo leer la lista o no existe: ${listName}`);
-                    return []; // Ignoramos si la lista no existe en el sitio actual
-                }
-                
+                const fieldsRes = await fetch(`${siteUrl}/_api/web/lists/getByTitle('${listName}')/Fields?$select=Title,InternalName`, { headers });
+                if (!fieldsRes.ok) return [];
                 const fieldsData = await fieldsRes.json();
-
-                // Función auxiliar para mapear el título visual a su nombre interno de base de datos
-                const getIntName = (titles) => {
-                    const field = fieldsData.value.find(f => titles.some(t => f.Title.toLowerCase().includes(t.toLowerCase())));
-                    return field ? field.InternalName : null;
-                };
-
-                const intSucursal = getIntName(['Sucursal', 'Ubicaci', 'Agencia']);
-                const intDeclarante = getIntName(['Declarante', 'Usuario']);
-                const intEstado = getIntName(['Estado']);
-                const intObservaciones = getIntName(['Observacion']);
-                const intComentarios = getIntName(['Comentario']);
-
-                // Construir consulta segura
-                const fvtSelects = [];
-                if (intSucursal) fvtSelects.push(`FieldValuesAsText/${intSucursal}`);
-                if (intDeclarante) fvtSelects.push(`FieldValuesAsText/${intDeclarante}`);
-                if (intEstado) fvtSelects.push(`FieldValuesAsText/${intEstado}`);
-
-                const expandStr = `Author,AttachmentFiles${fvtSelects.length > 0 ? ',FieldValuesAsText' : ''}`;
-                const selectStr = `*,Author/Title${fvtSelects.length > 0 ? ',' + fvtSelects.join(',') : ''}`;
+                const getInt = (names) => { const f = fieldsData.value.find(x => names.some(n => x.Title.toLowerCase().includes(n.toLowerCase()))); return f ? f.InternalName : null; };
                 
-                const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/items?$top=5000&$select=${selectStr}&$expand=${expandStr}`;
-
-                const res = await fetch(endpoint, { headers });
+                const sSuc = getInt(['Sucursal', 'Ubicaci', 'Agencia']), sDec = getInt(['Declarante', 'Usuario']);
+                const sEst = getInt(['Estado']), sObs = getInt(['Observacion']), sCom = getInt(['Comentario']);
+                
+                const fvt = []; if(sSuc) fvt.push(`FieldValuesAsText/${sSuc}`); if(sDec) fvt.push(`FieldValuesAsText/${sDec}`); if(sEst) fvt.push(`FieldValuesAsText/${sEst}`);
+                const exp = `Author,AttachmentFiles${fvt.length>0?',FieldValuesAsText':''}`;
+                const sel = `*,Author/Title${fvt.length>0?','+fvt.join(','):''}`;
+                
+                const res = await fetch(`${siteUrl}/_api/web/lists/getByTitle('${listName}')/items?$top=5000&$select=${sel}&$expand=${exp}`, { headers });
                 if (!res.ok) return [];
                 
                 const data = await res.json();
-                
-                // Mapear datos usando los nombres descubiertos dinámicamente
                 return data.value.map(item => {
-                    const fvt = item.FieldValuesAsText || {};
-                    let estadoVal = (intEstado && fvt[intEstado]) ? fvt[intEstado] : (item[intEstado] || item.Estado || '');
-                    
-                    // Asegurar que exista un estado por si la lista carece de dicha columna
-                    if(!estadoVal) estadoVal = defaultStatus;
-
+                    const f = item.FieldValuesAsText || {};
                     return {
                         Id: item.Id,
                         FechaCierre: item.Fecha_x0020_Cierre || item.FechaCierre || item.Created,
-                        _parsedSucursal: (intSucursal && fvt[intSucursal]) ? fvt[intSucursal] : (item[intSucursal] || item.Title || 'N/A'),
-                        _parsedUsuario: (intDeclarante && fvt[intDeclarante]) ? fvt[intDeclarante] : (item[intDeclarante] || item.Author?.Title || 'Desconocido'),
-                        _parsedEstado: estadoVal,
-                        _parsedObservaciones: (intObservaciones ? item[intObservaciones] : item.Observaciones) || '',
-                        _parsedComentarios: (intComentarios ? item[intComentarios] : item.Comentarios) || '',
+                        _parsedSucursal: (sSuc && f[sSuc]) ? f[sSuc] : (item[sSuc] || item.Title || 'N/A'),
+                        _parsedUsuario: (sDec && f[sDec]) ? f[sDec] : (item[sDec] || item.Author?.Title || 'Desconocido'),
+                        _parsedEstado: (sEst && f[sEst]) ? f[sEst] : (item[sEst] || item.Estado || defaultStatus),
+                        _parsedObservaciones: (sObs ? item[sObs] : item.Observaciones) || '',
+                        _parsedComentarios: (sCom ? item[sCom] : item.Comentarios) || '',
                         AttachmentFiles: item.AttachmentFiles || [],
-                        // Guardamos los nombres internos exactos para usarlos al guardar los cambios
-                        _intEstado: intEstado || 'Estado',
-                        _intComentarios: intComentarios || 'Comentarios',
-                        _listName: listName // Guardamos la lista de origen para poder guardar cambios ahí mismo
+                        _intEstado: sEst || 'Estado', _intComentarios: sCom || 'Comentarios', _listName: listName
                     };
                 });
-            } catch (error) {
-                console.warn(`Error al obtener datos de ${listName}:`, error);
-                return [];
-            }
+            } catch (error) { return []; }
         }
 
         async function loadData(showToastMsg = false) {
             showLoader();
-
             if(state.isDemoMode) {
-                setTimeout(() => {
-                    processData();
-                    hideLoader();
-                    if(showToastMsg) showToast("Datos sincronizados (Demo)", "success");
-                }, 800); // Simulamos carga para que se vea el loader bonito
+                setTimeout(() => { processData(); hideLoader(); if(showToastMsg) showToast("Actualizado", "success"); }, 600);
                 return;
             }
-
             try {
-                const accounts = msalInstance.getAllAccounts();
-                if (accounts.length === 0) throw new Error("No autenticado");
-
-                const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
-                const headers = { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" };
+                const acc = msalInstance.getAllAccounts();
+                if (!acc.length) throw new Error("No auth");
+                const token = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: acc[0] });
+                const head = { "Authorization": `Bearer ${token.accessToken}`, "Accept": "application/json;odata=nometadata" };
                 
-                // Fetch de las 3 listas simultáneamente usando Promise.all para ganar velocidad
-                const [pendientes, finalizados, rechazados] = await Promise.all([
-                    fetchList('CIERRES', 'En espera', headers),
-                    fetchList('Cierres Finalizados', 'Finalizado', headers),
-                    fetchList('Cierres Rechazados', 'Rechazado', headers)
+                const [p, f, r] = await Promise.all([
+                    fetchList('CIERRES', 'En espera', head),
+                    fetchList('Cierres Finalizados', 'Finalizado', head),
+                    fetchList('Cierres Rechazados', 'Rechazado', head)
                 ]);
-
-                // Juntar todos los items
-                state.items = [...pendientes, ...finalizados, ...rechazados];
-
-                if (state.items.length === 0) {
-                    throw new Error("No se obtuvieron registros de ninguna lista.");
-                }
-
-                if(showToastMsg) showToast("Datos sincronizados con éxito desde SharePoint", "success");
+                state.items = [...p, ...f, ...r];
+                if (!state.items.length) throw new Error("Empty lists");
+                if(showToastMsg) showToast("Datos actualizados", "success");
                 processData();
-
             } catch (error) {
-                console.error("Error al cargar desde SharePoint:", error);
-                
-                if(showToastMsg) {
-                    showToast("No se pudieron cargar los datos reales. Revisa la consola.", "error", 6000);
-                } else {
-                    showToast("Error de conexión a la API. Pasando a Modo Demo...", "error", 6000);
-                }
-                
-                // Si falla (por ejemplo, porque las credenciales expiraron o no hay lista), activamos el demo.
+                if(showToastMsg) showToast("Error de conexión", "error");
                 if(state.items.length === 0) enableDemoMode();
             } finally {
                 hideLoader();
@@ -1133,569 +882,286 @@
         }
 
         function processData() {
-            // 1. Filtrar por Pestaña
-            let result = state.items;
-            if (state.currentTab !== 'Todos') {
-                result = result.filter(item => item._parsedEstado.toLowerCase().includes(state.currentTab.toLowerCase()));
-            }
-
-            // 2. Filtrar por Búsqueda (Global Search)
+            let res = state.items;
+            if (state.currentTab !== 'Todos') res = res.filter(i => i._parsedEstado.toLowerCase().includes(state.currentTab.toLowerCase()));
+            
             const q = state.searchQuery.toLowerCase();
-            if (q) {
-                result = result.filter(item => 
-                    item.Id.toString().includes(q) ||
-                    item._parsedSucursal.toLowerCase().includes(q) ||
-                    item._parsedUsuario.toLowerCase().includes(q)
-                );
-            }
-
-            // 3. Ordenar
-            result.sort((a, b) => {
-                let valA = a[state.sortCol] || a[`_parsed${state.sortCol}`] || '';
-                let valB = b[state.sortCol] || b[`_parsed${state.sortCol}`] || '';
-                
-                if(state.sortCol === 'FechaCierre') {
-                    valA = new Date(valA).getTime() || 0;
-                    valB = new Date(valB).getTime() || 0;
-                } else if(typeof valA === 'string') {
-                    valA = valA.toLowerCase();
-                    valB = valB.toLowerCase();
-                }
-
-                if (valA < valB) return state.sortAsc ? -1 : 1;
-                if (valA > valB) return state.sortAsc ? 1 : -1;
+            if (q) res = res.filter(i => i.Id.toString().includes(q) || i._parsedSucursal.toLowerCase().includes(q) || i._parsedUsuario.toLowerCase().includes(q));
+            
+            res.sort((a, b) => {
+                let vA = a[state.sortCol] || a[`_parsed${state.sortCol}`] || '';
+                let vB = b[state.sortCol] || b[`_parsed${state.sortCol}`] || '';
+                if(state.sortCol === 'FechaCierre') { vA = new Date(vA).getTime() || 0; vB = new Date(vB).getTime() || 0; } 
+                else if(typeof vA === 'string') { vA = vA.toLowerCase(); vB = vB.toLowerCase(); }
+                if (vA < vB) return state.sortAsc ? -1 : 1;
+                if (vA > vB) return state.sortAsc ? 1 : -1;
                 return 0;
             });
 
-            state.filteredItems = result;
-            
-            // Reset pagination si excede
-            const maxPage = Math.ceil(result.length / state.itemsPerPage) || 1;
-            if(state.page > maxPage) state.page = maxPage;
+            state.filteredItems = res;
+            const mx = Math.ceil(res.length / state.itemsPerPage) || 1;
+            if(state.page > mx) state.page = mx;
 
-            updateDashboardStats();
+            updateStats();
             renderTable();
         }
 
-        /**
-         * ==========================================
-         * RENDERIZADO Y LÓGICA DE UI
-         * ==========================================
-         */
-        function updateDashboardStats() {
-            const total = state.items.length;
-            const pendientes = state.items.filter(i => i._parsedEstado.includes('espera')).length;
-            const finalizados = state.items.filter(i => i._parsedEstado.includes('Finalizado')).length;
-            const rechazados = state.items.filter(i => i._parsedEstado.includes('Rechazado')).length;
+        // --- Processing & Render ---
+        function updateStats() {
+            animateValue('statTotal', state.items.length);
+            animateValue('statPendiente', state.items.filter(i => i._parsedEstado.includes('espera')).length);
+            animateValue('statFinalizado', state.items.filter(i => i._parsedEstado.includes('Finalizado')).length);
+            animateValue('statRechazado', state.items.filter(i => i._parsedEstado.includes('Rechazado')).length);
 
-            animateValue('statTotal', total);
-            animateValue('statPendiente', pendientes);
-            animateValue('statFinalizado', finalizados);
-            animateValue('statRechazado', rechazados);
-
-            // Update tab badges
-            const badge = document.getElementById('badge-pendientes');
-            if(pendientes > 0) {
-                badge.innerText = pendientes;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            const p = state.items.filter(i => i._parsedEstado.includes('espera')).length;
+            const b = document.getElementById('badge-pendientes');
+            if(p>0) { b.innerText = `(${p})`; b.classList.remove('hidden'); } else b.classList.add('hidden');
         }
 
-        // Animación suave de números
-        function animateValue(id, end, duration = 1000) {
+        function animateValue(id, end) {
             const obj = document.getElementById(id);
             if(!obj) return;
-            const current = parseInt(obj.innerText) || 0;
-            if(current === end) {
-                obj.innerText = end;
-                return;
-            }
-            
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerText = Math.floor(progress * (end - current) + current);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    obj.innerText = end;
-                }
+            const start = parseInt(obj.innerText) || 0;
+            if(start === end) return obj.innerText = end;
+            const dur = 800; let st = null;
+            const step = (ts) => {
+                if(!st) st = ts;
+                const p = Math.min((ts - st) / dur, 1);
+                obj.innerText = Math.floor(p * (end - start) + start);
+                if(p < 1) requestAnimationFrame(step); else obj.innerText = end;
             };
-            window.requestAnimationFrame(step);
+            requestAnimationFrame(step);
         }
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+            const st = (state.page - 1) * state.itemsPerPage;
+            const paged = state.filteredItems.slice(st, st + state.itemsPerPage);
 
-            const startIdx = (state.page - 1) * state.itemsPerPage;
-            const endIdx = startIdx + state.itemsPerPage;
-            const paginatedItems = state.filteredItems.slice(startIdx, endIdx);
-
-            if (paginatedItems.length === 0) {
-                tbody.innerHTML = `
-                    <tr><td colspan="8" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center justify-center text-gray-400">
-                            <svg class="mb-4" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-                            <p class="text-lg font-medium text-gray-900 mb-1">Sin resultados</p>
-                            <p class="text-sm text-gray-500">No hay registros que coincidan con los filtros actuales.</p>
-                        </div>
-                    </td></tr>
-                `;
+            if (!paged.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-20 text-center text-apple-textMuted"><p class="text-[15px] font-medium text-apple-text">No hay expedientes</p><p class="text-[13px] mt-1">Ajusta los filtros o cambia de pestaña.</p></td></tr>`;
             } else {
-                paginatedItems.forEach((item, index) => {
+                paged.forEach((i, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50/50 transition-colors group relative';
-                    tr.style.animation = `fadeIn 0.3s ease-out forwards ${index * 0.05}s`;
+                    tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-colors group';
+                    tr.style.animation = `fadeIn 0.3s ease-out forwards ${idx * 0.03}s`;
                     tr.style.opacity = '0';
 
-                    const dateObj = new Date(item.FechaCierre);
-                    const fechaStr = isNaN(dateObj.getTime()) ? 'N/A' : dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-                    
-                    const avatarColor = getAvatarColor(item._parsedUsuario);
-                    const initials = getInitials(item._parsedUsuario);
-
-                    const attCount = item.AttachmentFiles ? item.AttachmentFiles.length : 0;
-                    const attHtml = attCount > 0 
-                        ? `<div class="flex items-center justify-center"><span class="flex items-center gap-1 bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-medium border border-gray-200 shadow-sm"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${attCount}</span></div>`
-                        : `<span class="text-gray-300 text-center block">-</span>`;
+                    const fStr = isNaN(new Date(i.FechaCierre)) ? 'N/A' : new Date(i.FechaCierre).toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+                    const clr = getAvatarColor(i._parsedUsuario);
+                    const inits = getInitials(i._parsedUsuario);
+                    const att = i.AttachmentFiles?.length || 0;
+                    const attHtml = att > 0 ? `<span class="inline-flex items-center gap-1 bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[11px] font-semibold"><svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${att}</span>` : `<span class="text-gray-300">-</span>`;
 
                     tr.innerHTML = `
-                        <td class="px-5 py-4 border-b border-gray-100 text-center w-12">
-                            <input type="checkbox" class="apple-checkbox row-checkbox" value="${item.Id}" onchange="updateBulkActions()">
+                        <td class="px-6 py-3 text-center w-12"><input type="checkbox" class="apple-checkbox row-checkbox" value="${i.Id}" onchange="updateBulkActions()"></td>
+                        <td class="px-4 py-3 text-[13px] text-apple-textMuted font-mono">#${i.Id}</td>
+                        <td class="px-4 py-3 text-[13px] font-medium text-apple-text">${fStr}</td>
+                        <td class="px-4 py-3 text-[13px] font-semibold text-apple-text">${i._parsedSucursal}</td>
+                        <td class="px-4 py-3 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white" style="background-color:${clr}">${inits}</div>
+                            <span class="text-[13px] font-medium text-apple-text">${i._parsedUsuario}</span>
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-sm text-gray-500 font-mono">
-                            #${item.Id}
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">${fechaStr}</div>
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
-                            <div class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                <svg class="text-gray-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                ${item._parsedSucursal}
-                            </div>
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm" style="background-color: ${avatarColor}">
-                                    ${initials}
-                                </div>
-                                <span class="text-sm text-gray-700 font-medium">${item._parsedUsuario}</span>
-                            </div>
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
-                            ${attHtml}
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-center">
-                            ${renderStatusBadge(item._parsedEstado)}
-                        </td>
-                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-right">
-                            <button onclick="openModal(${item.Id}, '${item._listName}')" class="apple-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-brand-blue hover:text-white transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Ver detalle">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        <td class="px-4 py-3 text-center">${attHtml}</td>
+                        <td class="px-4 py-3 text-center">${renderBadge(i._parsedEstado)}</td>
+                        <td class="px-6 py-3 text-right">
+                            <button onclick="openModal(${i.Id}, '${i._listName}')" class="apple-active inline-flex w-7 h-7 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-apple-blue hover:text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
-
             renderPagination();
             updateSortIcons();
         }
 
-        function renderStatusBadge(estado) {
-            const e = estado.toLowerCase();
-            if(e.includes('finalizado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-green-100 text-green-700 border border-green-200">Aprobado</span>`;
-            if(e.includes('espera')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-yellow-100 text-yellow-700 border border-yellow-200"><span class="animate-pulse mr-1">●</span> Pendiente</span>`;
-            if(e.includes('rechazado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-red-100 text-red-700 border border-red-200">Rechazado</span>`;
-            return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 border border-gray-200">${estado || 'N/A'}</span>`;
+        function renderBadge(est) {
+            const e = est.toLowerCase();
+            if(e.includes('finalizado')) return `<span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-apple-greenLight text-apple-green">Aprobado</span>`;
+            if(e.includes('espera')) return `<span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-orange-50 text-apple-orange flex items-center justify-center gap-1.5 inline-flex"><span class="w-1.5 h-1.5 rounded-full bg-apple-orange animate-pulse"></span>Pendiente</span>`;
+            if(e.includes('rechazado')) return `<span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-apple-redLight text-apple-red">Rechazado</span>`;
+            return `<span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-gray-100 text-gray-600">${est}</span>`;
         }
 
-        function getAvatarColor(name) {
-            const colors = ['#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#FF2D55'];
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            return colors[Math.abs(hash) % colors.length];
+        function getAvatarColor(str) {
+            const c = ['#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6'];
+            let h = 0; for(let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
+            return c[Math.abs(h)%c.length];
         }
 
         function renderPagination() {
-            const total = state.filteredItems.length;
-            const maxPage = Math.ceil(total / state.itemsPerPage) || 1;
-            
-            const start = total === 0 ? 0 : (state.page - 1) * state.itemsPerPage + 1;
-            const end = Math.min(start + state.itemsPerPage - 1, total);
-            
-            document.getElementById('paginationInfo').innerHTML = `Mostrando <span class="font-bold text-gray-900">${start}</span> a <span class="font-bold text-gray-900">${end}</span> de <span class="font-bold text-gray-900">${total}</span> registros`;
+            const t = state.filteredItems.length;
+            const mx = Math.ceil(t / state.itemsPerPage) || 1;
+            const s = t===0?0:(state.page-1)*state.itemsPerPage+1;
+            const e = Math.min(s+state.itemsPerPage-1, t);
+            document.getElementById('paginationInfo').innerHTML = `Mostrando <span class="font-semibold text-apple-text">${s}</span> a <span class="font-semibold text-apple-text">${e}</span> de <span class="font-semibold text-apple-text">${t}</span>`;
             
             document.getElementById('btnPrevPage').disabled = state.page === 1;
-            document.getElementById('btnNextPage').disabled = state.page === maxPage;
+            document.getElementById('btnNextPage').disabled = state.page === mx;
 
-            // Render page numbers
-            const pageNumbersDiv = document.getElementById('pageNumbers');
-            pageNumbersDiv.innerHTML = '';
-            
-            // Simple logic for small number of pages
-            for(let i = 1; i <= maxPage; i++) {
-                if (maxPage > 7) {
-                    if (i !== 1 && i !== maxPage && Math.abs(i - state.page) > 1) {
-                        if (i === 2 || i === maxPage - 1) {
-                            pageNumbersDiv.innerHTML += `<span class="px-2 text-gray-400">...</span>`;
-                        }
-                        continue;
-                    }
+            const div = document.getElementById('pageNumbers'); div.innerHTML = '';
+            for(let i=1; i<=mx; i++) {
+                if(mx>7 && i!==1 && i!==mx && Math.abs(i-state.page)>1) {
+                    if(i===2 || i===mx-1) div.innerHTML += `<span class="px-1 text-gray-400 text-sm">...</span>`;
+                    continue;
                 }
-                
                 const btn = document.createElement('button');
-                btn.className = `apple-btn w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${i === state.page ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/30' : 'text-gray-600 hover:bg-gray-200'}`;
-                btn.innerText = i;
-                btn.onclick = () => { state.page = i; renderTable(); };
-                pageNumbersDiv.appendChild(btn);
+                btn.className = `w-7 h-7 flex items-center justify-center rounded-full text-[13px] font-medium transition-colors ${i===state.page?'bg-apple-text text-white':'text-apple-textMuted hover:bg-gray-100'}`;
+                btn.innerText = i; btn.onclick = () => { state.page = i; renderTable(); };
+                div.appendChild(btn);
             }
         }
 
-        function changePage(delta) {
-            const maxPage = Math.ceil(state.filteredItems.length / state.itemsPerPage) || 1;
-            const newPage = state.page + delta;
-            if(newPage >= 1 && newPage <= maxPage) {
-                state.page = newPage;
-                renderTable();
-            }
+        function changePage(d) {
+            const mx = Math.ceil(state.filteredItems.length / state.itemsPerPage) || 1;
+            const n = state.page + d;
+            if(n>=1 && n<=mx) { state.page = n; renderTable(); }
         }
 
         function sortData(col) {
-            if(state.sortCol === col) {
-                state.sortAsc = !state.sortAsc;
-            } else {
-                state.sortCol = col;
-                state.sortAsc = true;
-            }
+            if(state.sortCol === col) state.sortAsc = !state.sortAsc; else { state.sortCol = col; state.sortAsc = true; }
             processData();
         }
 
         function updateSortIcons() {
             document.querySelectorAll('.sort-icon').forEach(icon => {
-                const col = icon.getAttribute('data-col');
-                if (col === state.sortCol) {
-                    icon.classList.remove('opacity-0');
-                    icon.classList.add('opacity-100', 'text-brand-blue');
+                if (icon.getAttribute('data-col') === state.sortCol) {
+                    icon.classList.remove('opacity-0'); icon.classList.add('text-apple-blue');
                     icon.innerHTML = state.sortAsc ? '<path d="m6 15 6-6 6 6"/>' : '<path d="m6 9 6 6 6-6"/>';
                 } else {
-                    icon.classList.remove('opacity-100', 'text-brand-blue');
-                    icon.classList.add('opacity-0');
+                    icon.classList.add('opacity-0'); icon.classList.remove('text-apple-blue');
                     icon.innerHTML = '<path d="m6 9 6 6 6-6"/>';
                 }
             });
         }
 
-        function changeTab(tabName) {
-            state.currentTab = tabName;
-            state.page = 1; // Reset to page 1
-            
-            // UI Update tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm', 'active');
-                btn.classList.add('text-gray-500');
-            });
-            
-            const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.remove('text-gray-500');
-            activeBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm', 'active');
-            
+        function changeTab(t) {
+            state.currentTab = t; state.page = 1;
+            document.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${t}`).classList.add('active');
             processData();
         }
 
-        /**
-         * ==========================================
-         * EVENT LISTENERS Y ACCIONES UI
-         * ==========================================
-         */
+        // --- Interaction ---
         function setupEventListeners() {
-            // Buscador Global con Debounce
-            const searchInput = document.getElementById('globalSearch');
-            let timeout = null;
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    state.searchQuery = e.target.value;
-                    state.page = 1;
-                    processData();
-                }, 300);
-            });
-
-            // Atajo de teclado para buscar
-            document.addEventListener('keydown', (e) => {
-                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                    e.preventDefault();
-                    searchInput.focus();
-                }
-            });
+            const s = document.getElementById('globalSearch'); let t = null;
+            s.addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { state.searchQuery = e.target.value; state.page = 1; processData(); }, 300); });
+            document.addEventListener('keydown', e => { if((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); s.focus(); } });
         }
 
-        // Acciones Masivas (Checkboxes)
-        function toggleSelectAll(source) {
-            const checkboxes = document.querySelectorAll('.row-checkbox');
-            checkboxes.forEach(cb => cb.checked = source.checked);
-            updateBulkActions();
-        }
-
+        function toggleSelectAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); updateBulkActions(); }
+        
         function updateBulkActions() {
-            const checked = document.querySelectorAll('.row-checkbox:checked').length;
-            const bulkDiv = document.getElementById('bulkActions');
-            if(checked > 0) {
-                document.getElementById('selectedCount').innerText = checked;
-                bulkDiv.classList.remove('hidden');
-            } else {
-                bulkDiv.classList.add('hidden');
-                document.getElementById('selectAllCheckbox').checked = false;
-            }
+            const c = document.querySelectorAll('.row-checkbox:checked').length;
+            const d = document.getElementById('bulkActions');
+            if(c>0) { document.getElementById('selectedCount').innerText = c; d.classList.remove('hidden'); }
+            else { d.classList.add('hidden'); document.getElementById('selectAllCheckbox').checked = false; }
         }
 
-        // Exportar a CSV
         function exportToCSV() {
-            if(state.filteredItems.length === 0) {
-                showToast("No hay datos para exportar", "info");
-                return;
-            }
-            
-            const headers = ['ID', 'Fecha', 'Sucursal', 'Declarante', 'Estado', 'Observaciones', 'Resolucion'];
-            const rows = state.filteredItems.map(item => [
-                item.Id,
-                new Date(item.FechaCierre).toLocaleDateString('es-ES'),
-                `"${item._parsedSucursal}"`,
-                `"${item._parsedUsuario}"`,
-                item._parsedEstado,
-                `"${item._parsedObservaciones.replace(/"/g, '""')}"`,
-                `"${item._parsedComentarios.replace(/"/g, '""')}"`
-            ]);
-            
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Cierres_Imade_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            
-            showToast("Archivo CSV generado correctamente", "success");
+            if(!state.filteredItems.length) return showToast("No hay datos", "info");
+            const h = ['ID','Fecha','Sucursal','Declarante','Estado','Observaciones','Resolucion'];
+            const r = state.filteredItems.map(i => [i.Id, new Date(i.FechaCierre).toLocaleDateString(), `"${i._parsedSucursal}"`, `"${i._parsedUsuario}"`, i._parsedEstado, `"${i._parsedObservaciones.replace(/"/g,'')}"`, `"${i._parsedComentarios.replace(/"/g,'')}"`]);
+            const csv = "data:text/csv;charset=utf-8," + [h.join(","), ...r.map(e => e.join(","))].join("\n");
+            const a = document.createElement("a"); a.href = encodeURI(csv); a.download = `Cierres_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a); a.click(); a.remove();
+            showToast("CSV Exportado", "success");
         }
 
-        /**
-         * ==========================================
-         * MODALES Y FORMULARIOS
-         * ==========================================
-         */
-        function openModal(id, listName) {
-            const item = state.items.find(i => i.Id === id && (i._listName === listName || !listName));
+        // --- Modals ---
+        function openModal(id, lName) {
+            const item = state.items.find(i => i.Id === id && (i._listName === lName || !lName));
             if(!item) return;
+            state.currentEditingId = id; state.currentEditingList = item._listName || 'CIERRES';
             
-            state.currentEditingId = id;
-            state.currentEditingList = item._listName || 'CIERRES';
-            
-            // Llenar datos left column
             document.getElementById('modalId').innerText = item.Id;
             document.getElementById('modalSucursal').innerText = item._parsedSucursal;
             document.getElementById('modalUsuario').innerText = item._parsedUsuario;
             
-            const avatarColor = getAvatarColor(item._parsedUsuario);
-            const avatarDiv = document.getElementById('modalAvatar');
-            avatarDiv.style.backgroundColor = avatarColor;
-            avatarDiv.style.color = "white";
-            avatarDiv.innerText = getInitials(item._parsedUsuario);
-
-            const dateObj = new Date(item.FechaCierre);
-            document.getElementById('modalFecha').innerText = isNaN(dateObj.getTime()) ? 'Fecha desconocida' : dateObj.toLocaleString('es-ES');
+            const av = document.getElementById('modalAvatar');
+            av.style.backgroundColor = getAvatarColor(item._parsedUsuario); av.style.color = "white"; av.innerText = getInitials(item._parsedUsuario);
+            document.getElementById('modalFecha').innerText = isNaN(new Date(item.FechaCierre)) ? 'Desconocida' : new Date(item.FechaCierre).toLocaleString('es-ES');
             
-            // Llenar forms right column
-            const estadoSelect = document.getElementById('inputEstado');
-            // Mapeo simple de estado para seleccionar la opción correcta
-            const e = item._parsedEstado.toLowerCase();
-            if(e.includes('finalizado')) estadoSelect.value = 'Finalizado';
-            else if(e.includes('rechazado')) estadoSelect.value = 'Rechazado';
-            else estadoSelect.value = 'En espera';
+            const eSel = document.getElementById('inputEstado');
+            const eLow = item._parsedEstado.toLowerCase();
+            if(eLow.includes('finalizado')) eSel.value = 'Finalizado'; else if(eLow.includes('rechazado')) eSel.value = 'Rechazado'; else eSel.value = 'En espera';
 
-            document.getElementById('inputObservaciones').value = item._parsedObservaciones || 'Sin observaciones.';
+            document.getElementById('inputObservaciones').value = item._parsedObservaciones || 'Sin msj.';
             document.getElementById('inputComentarios').value = item._parsedComentarios || '';
 
-            // Adjuntos
-            const adjuntosContainer = document.getElementById('modalAdjuntos');
-            adjuntosContainer.innerHTML = '';
-            if(item.AttachmentFiles && item.AttachmentFiles.length > 0) {
-                item.AttachmentFiles.forEach(file => {
-                    // USO DEL DOMINIO RAÍZ PARA EVITAR ERROR 404
-                    const attachUrl = state.isDemoMode ? '#' : `${baseDomainUrl}${file.ServerRelativeUrl}`;
-                    
-                    adjuntosContainer.innerHTML += `
-                        <a href="${attachUrl}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-200/50 hover:bg-gray-100 transition-colors group">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            const attC = document.getElementById('modalAdjuntos'); attC.innerHTML = '';
+            if(item.AttachmentFiles?.length > 0) {
+                item.AttachmentFiles.forEach(f => {
+                    const url = state.isDemoMode ? '#' : `${baseDomainUrl}${f.ServerRelativeUrl}`;
+                    attC.innerHTML += `
+                        <a href="${url}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-red-50 text-apple-red flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             </div>
-                            <span class="text-sm font-medium text-brand-blue group-hover:underline truncate flex-1">${file.FileName}</span>
-                            <svg class="text-gray-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                        </a>
-                    `;
+                            <span class="text-[13px] font-medium text-apple-blue group-hover:underline truncate flex-1">${f.FileName}</span>
+                        </a>`;
                 });
             } else {
-                adjuntosContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-sm text-gray-500 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50/30 justify-center">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        No se adjuntaron archivos
-                    </div>
-                `;
+                attC.innerHTML = `<div class="text-[13px] text-gray-400 p-4 border border-dashed border-gray-200 rounded-xl text-center">Sin adjuntos</div>`;
             }
 
-            // Animate In
-            const modal = document.getElementById('editModal');
-            const content = document.getElementById('editModalContent');
-            modal.classList.remove('hidden');
-            
-            // Force reflow
-            void modal.offsetWidth;
-            
-            modal.classList.remove('opacity-0');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
+            const m = document.getElementById('editModal'), mc = document.getElementById('editModalContent');
+            m.classList.remove('hidden'); void m.offsetWidth;
+            m.classList.remove('opacity-0'); mc.classList.remove('scale-95'); mc.classList.add('scale-100');
         }
 
         function closeModal() {
-            const modal = document.getElementById('editModal');
-            const content = document.getElementById('editModalContent');
-            
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                state.currentEditingId = null;
-                state.currentEditingList = null;
-            }, 300);
+            const m = document.getElementById('editModal'), mc = document.getElementById('editModalContent');
+            m.classList.add('opacity-0'); mc.classList.remove('scale-100'); mc.classList.add('scale-95');
+            setTimeout(() => { m.classList.add('hidden'); state.currentEditingId = null; state.currentEditingList = null; }, 300);
         }
 
         async function saveItemChanges() {
             if(!state.currentEditingId || !state.currentEditingList) return;
-            
-            const btn = document.getElementById('btnSave');
-            const spinner = document.getElementById('btnSaveSpinner');
-            const btnText = document.getElementById('btnSaveText');
-            const icon = document.getElementById('btnSaveIcon');
-            
-            const nuevoEstado = document.getElementById('inputEstado').value;
-            const nuevoComentario = document.getElementById('inputComentarios').value;
+            const btn = document.getElementById('btnSave'), sp = document.getElementById('btnSaveSpinner'), txt = document.getElementById('btnSaveText');
+            const nEst = document.getElementById('inputEstado').value, nCom = document.getElementById('inputComentarios').value;
 
-            btn.disabled = true;
-            spinner.classList.remove('hidden');
-            icon.classList.add('hidden');
-            btnText.innerText = "Guardando...";
+            btn.disabled = true; sp.classList.remove('hidden'); txt.innerText = "Guardando...";
 
             try {
                 if(state.isDemoMode) {
-                    // Simular latencia de red
-                    await new Promise(r => setTimeout(r, 1000));
-                    
-                    // Actualizar estado local
-                    const itemIndex = state.items.findIndex(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
-                    if(itemIndex > -1) {
-                        state.items[itemIndex]._parsedEstado = nuevoEstado;
-                        state.items[itemIndex]._parsedComentarios = nuevoComentario;
-                    }
+                    await new Promise(r => setTimeout(r, 800));
+                    const idx = state.items.findIndex(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
+                    if(idx > -1) { state.items[idx]._parsedEstado = nEst; state.items[idx]._parsedComentarios = nCom; }
                 } else {
-                    // Llamada real a SharePoint a la lista correcta
-                    const accounts = msalInstance.getAllAccounts();
-                    const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
-                    const itemToUpdate = state.items.find(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
+                    const acc = msalInstance.getAllAccounts();
+                    const tok = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: acc[0] });
+                    const item = state.items.find(i => i.Id === state.currentEditingId && i._listName === state.currentEditingList);
                     
-                    const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${state.currentEditingList}')/items(${state.currentEditingId})`;
-                    
-                    // Usamos los nombres internos exactos descubiertos
-                    const payload = {};
-                    if(itemToUpdate._intEstado) payload[itemToUpdate._intEstado] = nuevoEstado;
-                    if(itemToUpdate._intComentarios) payload[itemToUpdate._intComentarios] = nuevoComentario;
+                    const pay = {};
+                    if(item._intEstado) pay[item._intEstado] = nEst;
+                    if(item._intComentarios) pay[item._intComentarios] = nCom;
 
-                    const response = await fetch(updateEndpoint, {
-                        method: 'PATCH', 
-                        headers: {
-                            "Authorization": `Bearer ${tokenResponse.accessToken}`,
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                            "IF-MATCH": "*", 
-                            "X-HTTP-Method": "MERGE"
-                        },
-                        body: JSON.stringify(payload)
+                    const res = await fetch(`${siteUrl}/_api/web/lists/getByTitle('${state.currentEditingList}')/items(${state.currentEditingId})`, {
+                        method: 'PATCH', headers: { "Authorization": `Bearer ${tok.accessToken}`, "Accept": "application/json", "Content-Type": "application/json", "IF-MATCH": "*", "X-HTTP-Method": "MERGE" },
+                        body: JSON.stringify(pay)
                     });
-
-                    if (!response.ok) {
-                        const errData = await response.json();
-                        throw new Error(errData.error?.message?.value || "Error al actualizar en SharePoint");
-                    }
-                    
-                    // Recargar datos reales
+                    if (!res.ok) throw new Error("Error en SP");
                     loadData(false);
                 }
-
-                showToast(`Dictamen guardado: ${nuevoEstado}`, "success");
+                showToast("Cambios guardados", "success");
                 closeModal();
-                
-                if(state.isDemoMode) processData(); // Refrescar UI si es demo
-
+                if(state.isDemoMode) processData();
             } catch(error) {
-                console.error("Error guardando:", error);
-                showToast("Ocurrió un error al guardar los cambios: " + error.message, "error");
+                showToast("Error al guardar", "error");
             } finally {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                icon.classList.remove('hidden');
-                btnText.innerText = "Guardar Dictamen";
+                btn.disabled = false; sp.classList.add('hidden'); txt.innerText = "Guardar Dictamen";
             }
         }
 
-        // Modal Settings
-        function openSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            const content = document.getElementById('settingsModalContent');
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            modal.classList.remove('opacity-0');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-        }
-
-        function closeSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            const content = document.getElementById('settingsModalContent');
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        // Modal Logout Confirm
-        function openLogoutConfirmModal() {
-            closeSettingsModal();
-            const modal = document.getElementById('logoutConfirmModal');
-            const content = document.getElementById('logoutConfirmContent');
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            modal.classList.remove('opacity-0');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-        }
-
-        function closeLogoutConfirmModal() {
-            const modal = document.getElementById('logoutConfirmModal');
-            const content = document.getElementById('logoutConfirmContent');
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
+        function openSettingsModal() { const m = document.getElementById('settingsModal'), c = document.getElementById('settingsModalContent'); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); c.classList.remove('scale-95'); c.classList.add('scale-100'); }
+        function closeSettingsModal() { const m = document.getElementById('settingsModal'), c = document.getElementById('settingsModalContent'); m.classList.add('opacity-0'); c.classList.remove('scale-100'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
+        function openLogoutConfirmModal() { closeSettingsModal(); const m = document.getElementById('logoutConfirmModal'), c = document.getElementById('logoutConfirmContent'); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); c.classList.remove('scale-95'); c.classList.add('scale-100'); }
+        function closeLogoutConfirmModal() { const m = document.getElementById('logoutConfirmModal'), c = document.getElementById('logoutConfirmContent'); m.classList.add('opacity-0'); c.classList.remove('scale-100'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
     </script>
 </body>
 </html>
+
