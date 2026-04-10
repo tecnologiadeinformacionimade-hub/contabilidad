@@ -856,7 +856,7 @@
             }
         }
 
-        function showToast(message, type = 'success') {
+        function showToast(message, type = 'success', duration = 4000) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             
@@ -867,15 +867,15 @@
             };
 
             const icons = {
-                success: `<svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-                error: `<svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-                info: `<svg class="text-blue-500" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+                success: `<svg class="text-green-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+                error: `<svg class="text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+                info: `<svg class="text-blue-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
             };
 
-            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-floating ${colors[type]} transform translate-x-full transition-all duration-300 opacity-0 min-w-[300px] border border-gray-100 dark:border-gray-700 pointer-events-auto`;
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-floating ${colors[type]} transform translate-x-full transition-all duration-300 opacity-0 min-w-[300px] max-w-sm border border-gray-100 dark:border-gray-700 pointer-events-auto`;
             toast.innerHTML = `
                 ${icons[type]}
-                <span class="text-sm font-medium flex-1">${message}</span>
+                <span class="text-sm font-medium flex-1 break-words">${message}</span>
                 <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onclick="this.parentElement.remove()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
@@ -892,7 +892,7 @@
             setTimeout(() => {
                 toast.classList.add('translate-x-full', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            }, duration);
         }
 
         // Obtener iniciales para avatar
@@ -910,7 +910,7 @@
             try {
                 // Timeout para no quedarse pillado si MSAL no responde
                 const authPromise = new Promise(async (resolve, reject) => {
-                    const timer = setTimeout(() => reject(new Error("Timeout")), 5000);
+                    const timer = setTimeout(() => reject(new Error("Timeout de autenticación de MSAL")), 5000);
                     try {
                         const response = await msalInstance.handleRedirectPromise();
                         clearTimeout(timer);
@@ -983,7 +983,6 @@
         function enableDemoMode() {
             state.isDemoMode = true;
             document.getElementById('demoModeToggle').checked = true;
-            showToast("Conexión MSAL no disponible. Modo Demostración activado.", "info");
             
             // Simular usuario
             handleUIUpdate({ name: "Demo User", username: "demo@grupoimade.com" });
@@ -1002,6 +1001,7 @@
             const isChecked = document.getElementById('demoModeToggle').checked;
             if(isChecked) {
                 enableDemoMode();
+                showToast("Modo Demostración activado manualmente.", "info");
             } else {
                 location.reload(); // Recargar para forzar auth real
             }
@@ -1074,36 +1074,79 @@
 
                 const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
                 const headers = { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Accept": "application/json;odata=nometadata" };
+                const listName = 'CIERRES';
 
-                // Consultamos todos los items para hacer la magia local
-                const listName = 'CIERRES'; 
-                const selectStr = `Id,Title,Created,Author/Title,AttachmentFiles,OData__Sucursal,OData__Estado,OData__Observaciones,OData__Comentarios`;
-                const expandStr = `Author,AttachmentFiles`;
+                // 1. PASO CLAVE RESTAURADO: Obtener el diccionario de columnas de SharePoint
+                // Esto previene el error 400 OData si los nombres de columnas no coinciden.
+                const fieldsEndpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/Fields?$select=Title,InternalName,TypeAsString`;
+                const fieldsRes = await fetch(fieldsEndpoint, { headers });
+                if (!fieldsRes.ok) throw new Error("No se pudo obtener el esquema de la lista.");
+                const fieldsData = await fieldsRes.json();
+
+                // Función auxiliar para mapear el título visual a su nombre interno de base de datos
+                const getIntName = (titles) => {
+                    const field = fieldsData.value.find(f => titles.some(t => f.Title.toLowerCase().includes(t.toLowerCase())));
+                    return field ? field.InternalName : null;
+                };
+
+                const intSucursal = getIntName(['Sucursal', 'Ubicaci', 'Agencia']);
+                const intDeclarante = getIntName(['Declarante', 'Usuario']);
+                const intEstado = getIntName(['Estado']);
+                const intObservaciones = getIntName(['Observacion']);
+                const intComentarios = getIntName(['Comentario']);
+
+                // 2. Construir consulta segura
+                const fvtSelects = [];
+                if (intSucursal) fvtSelects.push(`FieldValuesAsText/${intSucursal}`);
+                if (intDeclarante) fvtSelects.push(`FieldValuesAsText/${intDeclarante}`);
+                if (intEstado) fvtSelects.push(`FieldValuesAsText/${intEstado}`);
+
+                const expandStr = `Author,AttachmentFiles${fvtSelects.length > 0 ? ',FieldValuesAsText' : ''}`;
+                const selectStr = `*,Author/Title${fvtSelects.length > 0 ? ',' + fvtSelects.join(',') : ''}`;
+                
                 const endpoint = `${siteUrl}/_api/web/lists/getByTitle('${listName}')/items?$top=5000&$select=${selectStr}&$expand=${expandStr}`;
 
                 const res = await fetch(endpoint, { headers });
-                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(`Error de SharePoint HTTP ${res.status}: ${errText}`);
+                }
                 
                 const data = await res.json();
                 
-                state.items = data.value.map(item => ({
-                    Id: item.Id,
-                    FechaCierre: item.Created,
-                    _parsedSucursal: item.OData__Sucursal || item.Title || 'N/A',
-                    _parsedUsuario: item.Author?.Title || 'Desconocido',
-                    _parsedEstado: item.OData__Estado || 'En espera',
-                    _parsedObservaciones: item.OData__Observaciones || '',
-                    _parsedComentarios: item.OData__Comentarios || '',
-                    AttachmentFiles: item.AttachmentFiles || []
-                }));
+                // 3. Mapear datos usando los nombres descubiertos dinámicamente
+                state.items = data.value.map(item => {
+                    const fvt = item.FieldValuesAsText || {};
+                    let estadoVal = (intEstado && fvt[intEstado]) ? fvt[intEstado] : (item[intEstado] || item.Estado || 'En espera');
 
-                if(showToastMsg) showToast("Datos sincronizados con éxito", "success");
+                    return {
+                        Id: item.Id,
+                        FechaCierre: item.Fecha_x0020_Cierre || item.FechaCierre || item.Created,
+                        _parsedSucursal: (intSucursal && fvt[intSucursal]) ? fvt[intSucursal] : (item[intSucursal] || item.Title || 'N/A'),
+                        _parsedUsuario: (intDeclarante && fvt[intDeclarante]) ? fvt[intDeclarante] : (item[intDeclarante] || item.Author?.Title || 'Desconocido'),
+                        _parsedEstado: estadoVal,
+                        _parsedObservaciones: (intObservaciones ? item[intObservaciones] : item.Observaciones) || '',
+                        _parsedComentarios: (intComentarios ? item[intComentarios] : item.Comentarios) || '',
+                        AttachmentFiles: item.AttachmentFiles || [],
+                        // Guardamos los nombres internos exactos para usarlos al guardar los cambios
+                        _intEstado: intEstado || 'Estado',
+                        _intComentarios: intComentarios || 'Comentarios'
+                    };
+                });
+
+                if(showToastMsg) showToast("Datos sincronizados con éxito desde SharePoint", "success");
                 processData();
 
             } catch (error) {
-                console.error("Error Fetch:", error);
-                if(showToastMsg) showToast("Error al conectar con SharePoint", "error");
-                // Si falla, caemos en gracia al modo demo para que el usuario vea algo
+                console.error("Error al cargar desde SharePoint:", error);
+                
+                if(showToastMsg) {
+                    showToast("No se pudieron cargar los datos reales. Revisa la consola.", "error", 6000);
+                } else {
+                    showToast("Error de conexión a la API. Pasando a Modo Demo...", "error", 6000);
+                }
+                
+                // Si falla (por ejemplo, porque las credenciales expiraron o no hay lista), activamos el demo.
                 if(state.items.length === 0) enableDemoMode();
             } finally {
                 refreshIcon.classList.remove('animate-spin');
@@ -1582,12 +1625,14 @@
                     // Llamada real a SharePoint
                     const accounts = msalInstance.getAllAccounts();
                     const tokenResponse = await msalInstance.acquireTokenSilent({ ...tokenRequest, account: accounts[0] });
+                    const itemToUpdate = state.items.find(i => i.Id === state.currentEditingId);
+                    
                     const updateEndpoint = `${siteUrl}/_api/web/lists/getByTitle('CIERRES')/items(${state.currentEditingId})`;
                     
-                    const payload = {
-                        "OData__Estado": nuevoEstado,
-                        "OData__Comentarios": nuevoComentario
-                    };
+                    // Usamos los nombres internos exactos descubiertos
+                    const payload = {};
+                    if(itemToUpdate._intEstado) payload[itemToUpdate._intEstado] = nuevoEstado;
+                    if(itemToUpdate._intComentarios) payload[itemToUpdate._intComentarios] = nuevoComentario;
 
                     const response = await fetch(updateEndpoint, {
                         method: 'PATCH', 
@@ -1601,7 +1646,10 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.ok) throw new Error("Error al actualizar en SharePoint");
+                    if (!response.ok) {
+                        const errData = await response.json();
+                        throw new Error(errData.error?.message?.value || "Error al actualizar en SharePoint");
+                    }
                     
                     // Recargar datos reales
                     loadData(false);
@@ -1614,7 +1662,7 @@
 
             } catch(error) {
                 console.error("Error guardando:", error);
-                showToast("Ocurrió un error al guardar los cambios", "error");
+                showToast("Ocurrió un error al guardar los cambios: " + error.message, "error");
             } finally {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
