@@ -65,7 +65,7 @@
             <div class="flex flex-col items-center mb-10 reveal-2">
                 <!-- Contenedor del logo también en cristal -->
                 <div class="bg-white/30 backdrop-blur-xl border border-white/50 p-3 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] mb-6">
-                    <img src="logo.png" alt="" class="h-10 object-contain" onerror="this.outerHTML='<span class=\'text-[#2A3C84] text-xl font-bold\'>GRUPO IMADE</span>'">
+                    <img src="logo.png" alt="Grupo Imade" class="h-10 object-contain" onerror="this.outerHTML='<span class=\'text-[#2A3C84] text-xl font-bold\'>GRUPO IMADE</span>'">
                 </div>
                 <h1 class="text-[26px] font-semibold tracking-tight text-center mb-1 text-[#1d1d1f]">Iniciar sesión</h1>
                 <p class="text-[15px] text-[#86868b] text-center font-medium">Portal de Cierres de Grupo Imade</p>
@@ -99,7 +99,7 @@
                 <div id="errorMessage" class="hidden overflow-hidden transition-all duration-300 reveal-4">
                     <div class="mt-2 bg-[#fff2f2]/80 backdrop-blur-md border border-[#ffcccc] text-[#e30000] text-[14px] px-4 py-3 rounded-xl flex items-center gap-3">
                         <svg class="shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <span id="errorText" class="font-medium">Credenciales incorrectas.</span>
+                        <span id="errorText" class="font-medium">Usuario o contraseña incorrectos.</span>
                     </div>
                 </div>
 
@@ -155,10 +155,11 @@
             errorMessage.classList.add('hidden');
 
             try {
-                // Petición a Google Sheets
+                // AQUÍ ESTÁ EL ARREGLO: 
+                // Enviamos el valor de "usuario" usando la etiqueta "email" que es la que espera el backend.
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ usuario: usuario, password: password })
+                    body: JSON.stringify({ email: usuario, password: password })
                 });
 
                 const result = await response.json();
@@ -176,8 +177,8 @@
                     }, 600);
 
                 } else {
-                    // Mostrar error
-                    errorText.innerText = result.message || "Usuario o contraseña incorrectos.";
+                    // Mostrar error forzando el texto "Usuario" en lugar de "Correo"
+                    errorText.innerText = "Usuario o contraseña incorrectos.";
                     errorMessage.classList.remove('hidden');
                 }
 
