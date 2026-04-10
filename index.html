@@ -7,80 +7,129 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tipografía moderna y limpia para interfaces minimalistas */
+        /* Tipografía San Francisco / Inter */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
         body { 
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Fondo gris ultra claro (slate-50) */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f5f5f7; 
+            color: #1d1d1f;
+            overflow: hidden; /* Evita scroll por los orbes de fondo */
         }
 
-        /* Animación fluida y sutil de entrada */
-        .fade-in-up { 
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        /* --- Animaciones estilo Apple (Suaves y elásticas) --- */
+        @keyframes appleReveal {
+            0% { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
         
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Animaciones escalonadas para cada elemento */
+        .reveal-1 { animation: appleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.1s; }
+        .reveal-2 { animation: appleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.2s; }
+        .reveal-3 { animation: appleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.3s; }
+        .reveal-4 { animation: appleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.4s; }
+
+        /* Movimiento de orbes ambientales */
+        @keyframes floatSlow {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .orb-1 { animation: floatSlow 15s ease-in-out infinite; }
+        .orb-2 { animation: floatSlow 18s ease-in-out infinite reverse; }
+
+        /* Ajuste premium para autofill de Chrome */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+            -webkit-text-fill-color: #1d1d1f !important;
+            transition: background-color 5000s ease-in-out 0s;
+            border-radius: 1rem;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 antialiased text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4 antialiased relative">
 
-    <div class="w-full max-w-[400px] fade-in-up">
+    <!-- Orbes Ambientales (Estilo macOS Blur) -->
+    <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#41A8DC]/20 blur-[100px] orb-1 pointer-events-none mix-blend-multiply"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-[#2A3C84]/15 blur-[120px] orb-2 pointer-events-none mix-blend-multiply"></div>
+
+    <div class="w-full max-w-[420px] relative z-10">
         
-        <!-- Encabezado / Logo -->
-        <div class="text-center mb-8">
-            <div class="inline-block p-4 bg-white rounded-2xl shadow-sm mb-4 border border-slate-100">
-                <img src="logo.png" alt="" class="h-10 object-contain" onerror="this.outerHTML='<span class=\'text-[#2A3C84] text-xl font-bold\'>GRUPO IMADE</span>'">
-            </div>
-            <h1 class="text-2xl font-semibold tracking-tight text-[#2A3C84]">Bienvenido</h1>
-            <p class="text-sm text-slate-500 mt-2">Ingresa tus credenciales para continuar</p>
-        </div>
-
-        <!-- Tarjeta de Formulario Minimalista -->
-        <div class="bg-white p-8 rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-100/50">
+        <!-- Tarjeta estilo Glassmorphism (Cristal esmerilado profundo) -->
+        <div class="bg-white/40 backdrop-blur-2xl border border-white/50 px-10 py-12 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05),_0_0_0_1px_rgba(255,255,255,0.4)_inset] reveal-1">
             
-            <form id="loginForm" class="flex flex-col gap-5">
+            <!-- Encabezado / Logo -->
+            <div class="flex flex-col items-center mb-10 reveal-2">
+                <!-- Contenedor del logo también en cristal -->
+                <div class="bg-white/30 backdrop-blur-xl border border-white/50 p-3 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] mb-6">
+                    <img src="logo.png" alt="" class="h-10 object-contain" onerror="this.outerHTML='<span class=\'text-[#2A3C84] text-xl font-bold\'>GRUPO IMADE</span>'">
+                </div>
+                <h1 class="text-[26px] font-semibold tracking-tight text-center mb-1 text-[#1d1d1f]">Iniciar sesión</h1>
+                <p class="text-[15px] text-[#86868b] text-center font-medium">Portal de Cierres de Grupo Imade</p>
+            </div>
+            
+            <form id="loginForm" class="flex flex-col gap-4">
                 
-                <!-- Usuario -->
-                <div>
-                    <label for="usuario" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Usuario</label>
-                    <input type="text" id="usuario" name="usuario" required 
-                        class="w-full px-4 py-3.5 bg-slate-50 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#41A8DC] focus:ring-4 focus:ring-[#41A8DC]/10 transition-all outline-none placeholder-slate-400"
-                        placeholder="Escribe tu usuario">
+                <!-- Inputs Flotantes Estilo Apple Premium (Cristal) -->
+                <div class="flex flex-col gap-5 reveal-3">
+                    
+                    <!-- Input Usuario -->
+                    <div class="relative group">
+                        <input type="text" id="usuario" name="usuario" required 
+                            class="peer w-full px-4 pt-6 pb-2 bg-white/30 backdrop-blur-md border border-white/50 rounded-2xl text-[17px] text-[#1d1d1f] focus:bg-white/60 focus:border-[#41A8DC]/50 focus:ring-4 focus:ring-[#41A8DC]/20 transition-all outline-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
+                            placeholder=" ">
+                        <!-- Label que flota al escribir -->
+                        <label for="usuario" class="absolute text-[16px] text-[#86868b] duration-200 transform -translate-y-3 scale-[0.85] top-[14px] z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-[0.85] peer-focus:-translate-y-3 pointer-events-none font-medium">Usuario</label>
+                    </div>
+
+                    <!-- Input Contraseña -->
+                    <div class="relative group">
+                        <input type="password" id="password" name="password" required 
+                            class="peer w-full px-4 pt-6 pb-2 bg-white/30 backdrop-blur-md border border-white/50 rounded-2xl text-[17px] text-[#1d1d1f] focus:bg-white/60 focus:border-[#41A8DC]/50 focus:ring-4 focus:ring-[#41A8DC]/20 transition-all outline-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
+                            placeholder=" ">
+                        <label for="password" class="absolute text-[16px] text-[#86868b] duration-200 transform -translate-y-3 scale-[0.85] top-[14px] z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-[0.85] peer-focus:-translate-y-3 pointer-events-none font-medium">Contraseña</label>
+                    </div>
+
                 </div>
 
-                <!-- Contraseña -->
-                <div>
-                    <label for="password" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Contraseña</label>
-                    <input type="password" id="password" name="password" required 
-                        class="w-full px-4 py-3.5 bg-slate-50 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#41A8DC] focus:ring-4 focus:ring-[#41A8DC]/10 transition-all outline-none placeholder-slate-400"
-                        placeholder="••••••••">
+                <!-- Mensaje de Error Animado -->
+                <div id="errorMessage" class="hidden overflow-hidden transition-all duration-300 reveal-4">
+                    <div class="mt-2 bg-[#fff2f2]/80 backdrop-blur-md border border-[#ffcccc] text-[#e30000] text-[14px] px-4 py-3 rounded-xl flex items-center gap-3">
+                        <svg class="shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span id="errorText" class="font-medium">Credenciales incorrectas.</span>
+                    </div>
                 </div>
 
-                <!-- Mensaje de Error (Sin colores estridentes, acorde al minimalismo) -->
-                <div id="errorMessage" class="hidden bg-slate-50 border border-slate-200 text-[#2A3C84] font-medium text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2">
-                    <svg class="shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span id="errorText">Credenciales incorrectas.</span>
+                <!-- Botón de Ingresar (Interactivo y brillante) -->
+                <div class="reveal-4 mt-2">
+                    <button type="submit" id="submitBtn" class="w-full relative group overflow-hidden bg-[#2A3C84] text-white font-semibold text-[17px] py-3.5 rounded-full transition-all duration-200 active:scale-[0.96] flex justify-center items-center gap-2 shadow-[0_4px_14px_rgba(42,60,132,0.3)] hover:shadow-[0_6px_20px_rgba(42,60,132,0.4)]">
+                        <!-- Brillo dinámico en hover -->
+                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        
+                        <span id="btnText" class="relative z-10">Continuar</span>
+                        <svg id="btnSpinner" class="animate-spin h-5 w-5 hidden text-white/80 relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
                 </div>
-
-                <!-- Botón de Ingresar -->
-                <button type="submit" id="submitBtn" class="w-full mt-2 bg-[#2A3C84] hover:bg-[#1e2b5e] text-white font-medium py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-[#2A3C84]/25 hover:shadow-[#2A3C84]/40 active:scale-[0.98]">
-                    <span id="btnText">Ingresar al sistema</span>
-                    <svg id="btnSpinner" class="animate-spin h-5 w-5 hidden text-white/70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                </button>
                 
             </form>
         </div>
 
         <!-- Pie de página simple -->
-        <div class="text-center mt-8">
-            <p class="text-xs text-slate-400">© 2024 Grupo Imade. Todos los derechos reservados.</p>
+        <div class="text-center mt-8 reveal-4">
+            <p class="text-[13px] text-[#86868b] font-medium mix-blend-multiply">Copyright © 2024 Grupo Imade.</p>
         </div>
 
     </div>
+
+    <!-- Definición de la animación del brillo del botón -->
+    <style>
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+    </style>
 
     <script>
         // URL de tu API de Google Apps Script
@@ -100,8 +149,8 @@
 
             // Estado de carga
             submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
-            btnText.innerText = "Autenticando...";
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            btnText.innerText = "Verificando...";
             btnSpinner.classList.remove('hidden');
             errorMessage.classList.add('hidden');
 
@@ -121,10 +170,10 @@
                     // Guardar sesión
                     sessionStorage.setItem('usuarioAcreditado', result.user);
                     
-                    // Redirigir a inicio.html
+                    // Redirigir a inicio.html (con ligera pausa para mostrar el éxito)
                     setTimeout(() => {
                         window.location.href = 'inicio.html';
-                    }, 500);
+                    }, 600);
 
                 } else {
                     // Mostrar error
@@ -134,14 +183,14 @@
 
             } catch (error) {
                 console.error("Error en login:", error);
-                errorText.innerText = "Error al conectar con el servidor.";
+                errorText.innerText = "No se pudo conectar con el servidor.";
                 errorMessage.classList.remove('hidden');
             } finally {
                 // Restaurar botón si hay error
                 if(errorMessage.classList.contains('hidden') === false) {
                     submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
-                    btnText.innerText = "Ingresar al sistema";
+                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    btnText.innerText = "Continuar";
                     btnSpinner.classList.add('hidden');
                 }
             }
