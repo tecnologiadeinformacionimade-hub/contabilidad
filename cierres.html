@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="antialiased transition-colors duration-500">
+<html lang="es" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,10 +16,9 @@
     <!-- MSAL.js para Autenticación con Microsoft 365 -->
     <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
     
-    <!-- Configuración extendida de Tailwind para diseño Glass y modo oscuro -->
+    <!-- Configuración extendida de Tailwind para diseño Glass -->
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -48,13 +47,11 @@
                             900: '#102a43',
                             blue: '#007AFF', // Apple Blue
                             dark: '#1C1C1E', // Apple Dark
-                            glass: 'rgba(255, 255, 255, 0.6)',
-                            glassDark: 'rgba(28, 28, 30, 0.6)'
+                            glass: 'rgba(255, 255, 255, 0.6)'
                         }
                     },
                     boxShadow: {
                         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-                        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
                         'floating': '0 20px 40px -10px rgba(0,0,0,0.1)',
                     },
                     animation: {
@@ -97,11 +94,6 @@
             --glass-blur: 20px;
         }
 
-        .dark {
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-bg: rgba(30, 30, 30, 0.65);
-        }
-
         body {
             background-color: #f5f5f7;
             background-image: 
@@ -113,14 +105,6 @@
             transition: background-color 0.5s ease;
         }
 
-        .dark body {
-            background-color: #000000;
-            background-image: 
-                radial-gradient(at 40% 20%, hsla(210,100%,15%,1) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, hsla(189,100%,15%,1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, hsla(280,100%,15%,1) 0px, transparent 50%);
-        }
-
         /* Utilidad Principal Glassmorphism */
         .glass-panel {
             background: var(--glass-bg);
@@ -130,19 +114,11 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
         }
 
-        .dark .glass-panel {
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-
         .glass-header {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
             border-bottom: 1px solid var(--glass-border);
-        }
-
-        .dark .glass-header {
-            background: rgba(28, 28, 30, 0.8);
         }
 
         .glass-input {
@@ -156,18 +132,6 @@
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
             border-color: rgba(0, 122, 255, 0.5);
-        }
-
-        .dark .glass-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .dark .glass-input:focus {
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
-            border-color: rgba(10, 132, 255, 0.5);
         }
 
         /* Scrollbars estilo macOS */
@@ -185,12 +149,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.3);
         }
-        .dark ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .dark ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
 
         /* Botones estilo Apple */
         .apple-btn {
@@ -205,10 +163,6 @@
             background: linear-gradient(90deg, rgba(200,200,200,0.1) 25%, rgba(200,200,200,0.2) 37%, rgba(200,200,200,0.1) 63%);
             background-size: 400% 100%;
             animation: skeleton-loading 1.4s ease infinite;
-        }
-        .dark .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 37%, rgba(255,255,255,0.05) 63%);
-            background-size: 400% 100%;
         }
         @keyframes skeleton-loading {
             0% { background-position: 100% 50%; }
@@ -227,9 +181,6 @@
             position: relative;
             cursor: pointer;
             transition: all 0.2s;
-        }
-        .dark .apple-checkbox {
-            border-color: #48484a;
         }
         .apple-checkbox:checked {
             background-color: #007AFF;
@@ -255,7 +206,17 @@
         }
     </style>
 </head>
-<body class="text-gray-900 dark:text-gray-100 min-h-screen flex flex-col selection:bg-brand-blue selection:text-white relative">
+<body class="text-gray-900 min-h-screen flex flex-col selection:bg-brand-blue selection:text-white relative">
+
+    <!-- Global Loading Overlay -->
+    <div id="globalLoader" class="fixed inset-0 bg-gray-900/70 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center text-white transition-opacity duration-300 opacity-0">
+        <div class="relative w-24 h-24 mb-6 flex items-center justify-center">
+            <svg class="animate-spin absolute inset-0 w-full h-full text-brand-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-100 shadow-lg" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <div class="w-10 h-10 rounded-full bg-brand-blue shadow-lg absolute"></div>
+        </div>
+        <h3 class="text-2xl font-bold mb-2 tracking-tight">Sincronizando SharePoint</h3>
+        <p class="text-sm text-gray-300">Descargando últimos movimientos y expedientes...</p>
+    </div>
 
     <!-- Elementos Decorativos de Fondo (Blobs) -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
@@ -277,10 +238,10 @@
                     <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-blue-600 shadow-md text-white font-bold text-xl">
                         I
                     </div>
-                    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700 hidden sm:block transition-colors"></div>
+                    <div class="h-6 w-px bg-gray-300 hidden sm:block transition-colors"></div>
                     <div class="flex flex-col">
                         <h1 class="text-lg font-semibold tracking-tight leading-tight">Grupo Imade</h1>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Gestor de Cierres Contables</span>
+                        <span class="text-xs text-gray-500 font-medium">Gestor de Cierres Contables</span>
                     </div>
                 </div>
 
@@ -290,38 +251,38 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
                     <input type="text" id="globalSearch" placeholder="Buscar por ID, Sucursal o Declarante... (Cmd+K)" 
-                        class="glass-input w-full pl-10 pr-4 py-2 rounded-full text-sm outline-none placeholder-gray-400 dark:placeholder-gray-500 shadow-sm"
+                        class="glass-input w-full pl-10 pr-4 py-2 rounded-full text-sm outline-none placeholder-gray-400 shadow-sm"
                         autocomplete="off">
                 </div>
 
-                <!-- Acciones de Usuario y Tema -->
+                <!-- Acciones de Usuario -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     
-                    <!-- Botón Modo Oscuro/Claro -->
-                    <button id="themeToggle" onclick="toggleTheme()" class="apple-btn p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Cambiar tema">
-                        <svg id="themeIconLight" class="w-5 h-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                        <svg id="themeIconDark" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                    </button>
+                    <!-- Botón Regresar a Inicio -->
+                    <a href="inicio.html" class="apple-btn flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:bg-gray-100/80 transition-colors font-medium text-sm border border-transparent hover:border-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                        <span class="hidden sm:inline">Regresar</span>
+                    </a>
 
                     <!-- Notificaciones -->
-                    <button class="apple-btn relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
+                    <button class="apple-btn relative p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-gray-900"></span>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                     </button>
 
                     <!-- Divisor -->
-                    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1 transition-colors"></div>
+                    <div class="h-6 w-px bg-gray-300 mx-1 transition-colors"></div>
 
                     <!-- Perfil de Usuario -->
-                    <div class="flex items-center gap-3 cursor-pointer group rounded-full pr-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors p-1" onclick="openSettingsModal()">
+                    <div class="flex items-center gap-3 cursor-pointer group rounded-full pr-2 hover:bg-gray-100 transition-colors p-1" onclick="openSettingsModal()">
                         <div id="userAvatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm skeleton">
                             <!-- Initials inserted via JS -->
                         </div>
                         <div class="hidden md:flex flex-col">
-                            <span id="userNameDisplay" class="text-sm font-medium text-gray-700 dark:text-gray-200 leading-none mb-1">Cargando...</span>
-                            <span id="userRoleDisplay" class="text-[10px] text-gray-500 dark:text-gray-400 leading-none">Conectando</span>
+                            <span id="userNameDisplay" class="text-sm font-medium text-gray-700 leading-none mb-1">Cargando...</span>
+                            <span id="userRoleDisplay" class="text-[10px] text-gray-500 leading-none">Conectando</span>
                         </div>
-                        <svg class="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        <svg class="text-gray-400 group-hover:text-gray-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
 
                 </div>
@@ -329,7 +290,7 @@
         </div>
     </nav>
 
-    <!-- PANTALLA DE CARGA / VERIFICACIÓN -->
+    <!-- PANTALLA DE CARGA / VERIFICACIÓN INICIAL -->
     <div id="authLoadingScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in relative z-10">
         <div class="glass-panel p-10 rounded-3xl flex flex-col items-center max-w-md w-full relative overflow-hidden">
             <!-- Efecto de brillo interior -->
@@ -340,10 +301,10 @@
                 <div class="w-8 h-8 rounded-full bg-brand-blue shadow-lg absolute"></div>
             </div>
             
-            <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 mb-2">Iniciando Ecosistema</h2>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Conectando de forma segura con Microsoft 365...</p>
+            <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 mb-2">Iniciando Ecosistema</h2>
+            <p class="text-gray-500 text-sm mb-6">Conectando de forma segura con Microsoft 365...</p>
             
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+            <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                 <div class="bg-brand-blue h-1.5 rounded-full w-1/3 animate-pulse-slow relative">
                     <div class="absolute inset-0 bg-white/30 skew-x-[-20deg] animate-[slideInRight_1s_infinite]"></div>
                 </div>
@@ -361,17 +322,13 @@
         <!-- Cabecera de Página -->
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 animate-slide-up">
             <div>
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Panel de Cierres</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Supervisa, filtra y gestiona el flujo contable en tiempo real.</p>
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900">Panel de Cierres</h2>
+                <p class="text-sm text-gray-500 mt-1">Supervisa, filtra y gestiona el flujo contable en tiempo real.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="exportToCSV()" class="apple-btn glass-panel px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-white/40 dark:hover:bg-black/40 transition-colors flex items-center gap-2">
+                <button onclick="exportToCSV()" class="apple-btn glass-panel px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/40 transition-colors flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Exportar CSV
-                </button>
-                <button onclick="loadData(true)" class="apple-btn bg-brand-blue text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors shadow-md shadow-brand-blue/30 flex items-center gap-2">
-                    <svg id="refreshIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                    Sincronizar
                 </button>
             </div>
         </div>
@@ -385,10 +342,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Total Registros</p>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Registros</p>
                     <div class="flex items-end gap-3">
-                        <h3 id="statTotal" class="text-3xl font-bold text-gray-900 dark:text-white">--</h3>
-                        <span class="text-xs font-medium text-green-500 bg-green-100 dark:bg-green-500/20 px-2 py-1 rounded-md mb-1">+12% este mes</span>
+                        <h3 id="statTotal" class="text-3xl font-bold text-gray-900">--</h3>
+                        <span class="text-xs font-medium text-green-500 bg-green-100 px-2 py-1 rounded-md mb-1">+12% este mes</span>
                     </div>
                 </div>
             </div>
@@ -399,10 +356,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Pendientes de Revisión</p>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pendientes de Revisión</p>
                     <div class="flex items-end gap-3">
-                        <h3 id="statPendiente" class="text-3xl font-bold text-gray-900 dark:text-white">--</h3>
-                        <span class="text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-500/20 px-2 py-1 rounded-md mb-1">Prioridad Alta</span>
+                        <h3 id="statPendiente" class="text-3xl font-bold text-gray-900">--</h3>
+                        <span class="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-md mb-1">Prioridad Alta</span>
                     </div>
                 </div>
             </div>
@@ -413,9 +370,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Cierres Aprobados</p>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cierres Aprobados</p>
                     <div class="flex items-end gap-3">
-                        <h3 id="statFinalizado" class="text-3xl font-bold text-gray-900 dark:text-white">--</h3>
+                        <h3 id="statFinalizado" class="text-3xl font-bold text-gray-900">--</h3>
                     </div>
                 </div>
             </div>
@@ -426,10 +383,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Rechazados / Errores</p>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Rechazados / Errores</p>
                     <div class="flex items-end gap-3">
-                        <h3 id="statRechazado" class="text-3xl font-bold text-gray-900 dark:text-white">--</h3>
-                        <span class="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md mb-1">Requieren acción</span>
+                        <h3 id="statRechazado" class="text-3xl font-bold text-gray-900">--</h3>
+                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md mb-1">Requieren acción</span>
                     </div>
                 </div>
             </div>
@@ -437,24 +394,24 @@
         </div>
 
         <!-- Área Principal de la Tabla -->
-        <div class="glass-panel rounded-2xl shadow-glass border border-white/50 dark:border-gray-700/50 flex flex-col animate-slide-up" style="animation-delay: 0.2s; min-height: 500px;">
+        <div class="glass-panel rounded-2xl shadow-glass border border-white/50 flex flex-col animate-slide-up" style="animation-delay: 0.2s; min-height: 500px;">
             
             <!-- Barra de Herramientas de la Tabla -->
-            <div class="p-4 sm:p-5 border-b border-gray-200/50 dark:border-gray-700/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative z-20">
+            <div class="p-4 sm:p-5 border-b border-gray-200/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative z-20">
                 
                 <!-- Selector de Pestañas Estilo Apple Segmented Control -->
-                <div class="flex p-1 bg-gray-200/50 dark:bg-gray-800/50 backdrop-blur-md rounded-xl w-full lg:w-auto overflow-x-auto custom-scrollbar">
-                    <button onclick="changeTab('En espera')" id="tab-En espera" class="tab-btn active relative px-5 py-1.5 text-sm font-semibold rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm transition-all whitespace-nowrap">
+                <div class="flex p-1 bg-gray-200/50 backdrop-blur-md rounded-xl w-full lg:w-auto overflow-x-auto custom-scrollbar">
+                    <button onclick="changeTab('En espera')" id="tab-En espera" class="tab-btn active relative px-5 py-1.5 text-sm font-semibold rounded-lg text-gray-900 bg-white shadow-sm transition-all whitespace-nowrap">
                         Pendientes
                         <span id="badge-pendientes" class="ml-1.5 bg-brand-blue text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
                     </button>
-                    <button onclick="changeTab('Finalizado')" id="tab-Finalizado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
+                    <button onclick="changeTab('Finalizado')" id="tab-Finalizado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
                         Aprobados
                     </button>
-                    <button onclick="changeTab('Rechazado')" id="tab-Rechazado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
+                    <button onclick="changeTab('Rechazado')" id="tab-Rechazado" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
                         Rechazados
                     </button>
-                    <button onclick="changeTab('Todos')" id="tab-Todos" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all whitespace-nowrap">
+                    <button onclick="changeTab('Todos')" id="tab-Todos" class="tab-btn relative px-5 py-1.5 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all whitespace-nowrap">
                         Todos
                     </button>
                 </div>
@@ -464,13 +421,13 @@
                     
                     <!-- Simulación de acciones masivas -->
                     <div id="bulkActions" class="hidden flex items-center gap-2 mr-2 animate-fade-in">
-                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400"><span id="selectedCount">0</span> seleccionados</span>
-                        <button class="text-xs bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 px-2 py-1 rounded hover:bg-green-100 transition-colors">Aprobar</button>
-                        <button class="text-xs bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800 px-2 py-1 rounded hover:bg-red-100 transition-colors">Rechazar</button>
+                        <span class="text-xs font-medium text-gray-500"><span id="selectedCount">0</span> seleccionados</span>
+                        <button class="text-xs bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition-colors">Aprobar</button>
+                        <button class="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition-colors">Rechazar</button>
                     </div>
 
                     <!-- Filtro extra -->
-                    <button class="apple-btn flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors">
+                    <button class="apple-btn flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100/50 rounded-lg border border-gray-200/50 hover:bg-gray-200/50 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                         <span class="hidden sm:inline">Filtros</span>
                     </button>
@@ -480,45 +437,45 @@
             <!-- Contenedor de la Tabla -->
             <div class="overflow-x-auto w-full flex-1 relative z-10 custom-scrollbar">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-50/50 dark:bg-gray-800/50 backdrop-blur-md sticky top-0 z-20 shadow-sm">
+                    <thead class="bg-gray-50/50 backdrop-blur-md sticky top-0 z-20 shadow-sm">
                         <tr>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 w-12 text-center">
+                            <th class="px-5 py-3 border-b border-gray-200 w-12 text-center">
                                 <input type="checkbox" id="selectAllCheckbox" class="apple-checkbox" onchange="toggleSelectAll(this)">
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors group" onclick="sortData('Id')">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Id')">
                                 <div class="flex items-center gap-1">
                                     ID <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                                 </div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors group" onclick="sortData('FechaCierre')">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('FechaCierre')">
                                 <div class="flex items-center gap-1">
                                     Fecha <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="FechaCierre" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                                 </div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors group" onclick="sortData('Sucursal')">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Sucursal')">
                                 <div class="flex items-center gap-1">
                                     Sucursal <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Sucursal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                                 </div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors group" onclick="sortData('Declarante')">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Declarante')">
                                 <div class="flex items-center gap-1">
                                     Declarante <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Declarante" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                                 </div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
                                 Adjuntos
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors group" onclick="sortData('Estado')">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-100/50 transition-colors group" onclick="sortData('Estado')">
                                 <div class="flex items-center justify-center gap-1">
                                     Estado <svg class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity sort-icon" data-col="Estado" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                                 </div>
                             </th>
-                            <th class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                            <th class="px-5 py-3 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
                                 Acciones
                             </th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white/30 dark:bg-black/20">
+                    <tbody id="tableBody" class="divide-y divide-gray-100 bg-white/30">
                         <!-- Skeletons iniciales -->
                         <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
                         <tr><td colspan="8" class="px-5 py-4"><div class="h-8 skeleton rounded w-full"></div></td></tr>
@@ -530,17 +487,17 @@
             </div>
 
             <!-- Paginación -->
-            <div class="p-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-900/30 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-b-2xl">
-                <span class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="paginationInfo">Mostrando <span class="font-bold text-gray-900 dark:text-white">0</span> a <span class="font-bold text-gray-900 dark:text-white">0</span> de <span class="font-bold text-gray-900 dark:text-white">0</span> registros</span>
+            <div class="p-4 border-t border-gray-200/50 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-b-2xl">
+                <span class="text-sm text-gray-500 font-medium" id="paginationInfo">Mostrando <span class="font-bold text-gray-900">0</span> a <span class="font-bold text-gray-900">0</span> de <span class="font-bold text-gray-900">0</span> registros</span>
                 
                 <div class="flex items-center gap-2">
-                    <button onclick="changePage(-1)" id="btnPrevPage" class="apple-btn p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button onclick="changePage(-1)" id="btnPrevPage" class="apple-btn p-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
                     <div id="pageNumbers" class="flex items-center gap-1 hidden sm:flex">
                         <!-- Números inyectados vía JS -->
                     </div>
-                    <button onclick="changePage(1)" id="btnNextPage" class="apple-btn p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button onclick="changePage(1)" id="btnNextPage" class="apple-btn p-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
@@ -548,7 +505,7 @@
         </div>
 
         <!-- Pie de página integrado -->
-        <footer class="mt-12 mb-6 text-center text-xs text-gray-400 dark:text-gray-500 flex flex-col sm:flex-row items-center justify-center gap-2 animate-fade-in">
+        <footer class="mt-12 mb-6 text-center text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-center gap-2 animate-fade-in">
             <span>&copy; 2026 Grupo Imade. Todos los derechos reservados.</span>
             <span class="hidden sm:inline">•</span>
             <span class="flex items-center gap-1">Diseñado con <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> y Glassmorphism</span>
@@ -566,69 +523,69 @@
         <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
         
         <!-- Contenido del Modal -->
-        <div class="glass-panel rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300 border border-white/40 dark:border-gray-700/50" id="editModalContent">
+        <div class="glass-panel rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300 border border-white/40" id="editModalContent">
             
             <!-- Header del Modal -->
-            <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center glass-header relative z-10">
+            <div class="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center glass-header relative z-10">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Expediente #<span id="modalId">--</span></h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Revisión contable</p>
+                        <h3 class="text-xl font-bold text-gray-900 leading-tight">Expediente #<span id="modalId">--</span></h3>
+                        <p class="text-xs text-gray-500 font-medium">Revisión contable</p>
                     </div>
                 </div>
-                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue/50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
             <!-- Cuerpo Dividido -->
-            <div class="flex flex-col md:flex-row flex-1 overflow-hidden bg-white/40 dark:bg-gray-900/40">
+            <div class="flex flex-col md:flex-row flex-1 overflow-hidden bg-white/40">
                 
                 <!-- Columna Izquierda: Información de solo lectura -->
-                <div class="w-full md:w-5/12 p-6 border-r border-gray-200/50 dark:border-gray-700/50 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative">
+                <div class="w-full md:w-5/12 p-6 border-r border-gray-200/50 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative">
                     
                     <!-- Tarjeta de Info Principal -->
-                    <div class="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-5 border border-white/50 dark:border-gray-700/50 shadow-sm backdrop-blur-md">
+                    <div class="bg-white/60 rounded-2xl p-5 border border-white/50 shadow-sm backdrop-blur-md">
                         <div class="grid grid-cols-1 gap-5">
                             <div>
-                                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                                     Sucursal / Agencia
                                 </p>
-                                <p id="modalSucursal" class="text-base font-semibold text-gray-900 dark:text-white">--</p>
+                                <p id="modalSucursal" class="text-base font-semibold text-gray-900">--</p>
                             </div>
                             
-                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent"></div>
+                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
                             <div>
-                                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                     Usuario Declarante
                                 </p>
                                 <div class="flex items-center gap-3 mt-1">
                                     <div id="modalAvatar" class="w-8 h-8 rounded-full bg-blue-100 text-brand-blue flex items-center justify-center font-bold text-xs">--</div>
-                                    <p id="modalUsuario" class="text-sm font-medium text-gray-900 dark:text-gray-200">--</p>
+                                    <p id="modalUsuario" class="text-sm font-medium text-gray-900">--</p>
                                 </div>
                             </div>
                             
-                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent"></div>
+                            <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
                             
                             <div>
-                                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     Fecha Registro
                                 </p>
-                                <p id="modalFecha" class="text-sm font-medium text-gray-800 dark:text-gray-300">--</p>
+                                <p id="modalFecha" class="text-sm font-medium text-gray-800">--</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Archivos Adjuntos -->
                     <div>
-                        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-gray-800 mb-3 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                             Evidencia Adjunta
                         </h4>
@@ -640,13 +597,13 @@
                 </div>
 
                 <!-- Columna Derecha: Formularios de Edición -->
-                <div class="w-full md:w-7/12 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-gray-900/30">
+                <div class="w-full md:w-7/12 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5 bg-gradient-to-b from-transparent to-gray-50/30">
                     
                     <!-- Estado -->
-                    <div class="glass-panel p-1 rounded-xl flex items-center relative overflow-hidden bg-white/50 dark:bg-gray-800/50">
+                    <div class="glass-panel p-1 rounded-xl flex items-center relative overflow-hidden bg-white/50">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-blue rounded-l-xl"></div>
-                        <label class="px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 w-1/3">Dictamen</label>
-                        <select id="inputEstado" class="w-2/3 bg-transparent border-none focus:ring-0 text-sm font-medium py-3 px-2 outline-none text-gray-900 dark:text-white cursor-pointer appearance-none">
+                        <label class="px-4 text-sm font-semibold text-gray-700 w-1/3">Dictamen</label>
+                        <select id="inputEstado" class="w-2/3 bg-transparent border-none focus:ring-0 text-sm font-medium py-3 px-2 outline-none text-gray-900 cursor-pointer appearance-none">
                             <option value="En espera" class="text-black">⏳ En espera (Revisión)</option>
                             <option value="Finalizado" class="text-black">✅ Aprobado / Finalizado</option>
                             <option value="Rechazado" class="text-black">❌ Rechazado / Corrección</option>
@@ -658,7 +615,7 @@
 
                     <!-- Observaciones Originales -->
                     <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2 flex justify-between">
+                        <label class="text-xs font-semibold text-gray-600 mb-2 flex justify-between">
                             Mensaje del Remitente
                             <span class="text-[10px] font-normal text-gray-400">Solo lectura</span>
                         </label>
@@ -666,28 +623,28 @@
                             <div class="absolute top-3 left-3 text-gray-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                             </div>
-                            <textarea id="inputObservaciones" rows="3" class="w-full glass-input rounded-xl pl-10 pr-4 py-3 text-sm text-gray-600 dark:text-gray-300 resize-none cursor-not-allowed opacity-80" readonly></textarea>
+                            <textarea id="inputObservaciones" rows="3" class="w-full glass-input rounded-xl pl-10 pr-4 py-3 text-sm text-gray-600 resize-none cursor-not-allowed opacity-80" readonly></textarea>
                         </div>
                     </div>
 
                     <!-- Comentarios de Resolución -->
                     <div class="flex flex-col flex-1">
-                        <label class="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-2 flex justify-between items-center">
+                        <label class="text-xs font-semibold text-gray-800 mb-2 flex justify-between items-center">
                             Resolución Oficial
-                            <span class="bg-blue-100 dark:bg-blue-900/40 text-brand-blue dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                            <span class="bg-blue-100 text-brand-blue text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/><path d="m22 7-8.9 7-3.1-3.1"/><path d="m16 19 2 2 4-4"/></svg>
                                 Se notificará
                             </span>
                         </label>
-                        <textarea id="inputComentarios" rows="4" class="w-full glass-input rounded-xl p-4 text-sm text-gray-900 dark:text-white resize-none shadow-inner flex-1 min-h-[120px]" placeholder="Escribe el motivo del cambio de estado, instrucciones para corregir o confirmación..."></textarea>
+                        <textarea id="inputComentarios" rows="4" class="w-full glass-input rounded-xl p-4 text-sm text-gray-900 resize-none shadow-inner flex-1 min-h-[120px]" placeholder="Escribe el motivo del cambio de estado, instrucciones para corregir o confirmación..."></textarea>
                     </div>
 
                 </div>
             </div>
 
             <!-- Footer del Modal (Botones) -->
-            <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 glass-header flex justify-end gap-3 z-10 relative">
-                <button onclick="closeModal()" class="apple-btn px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl transition-colors">
+            <div class="px-6 py-4 border-t border-gray-200/50 glass-header flex justify-end gap-3 z-10 relative">
+                <button onclick="closeModal()" class="apple-btn px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white/50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors">
                     Cancelar
                 </button>
                 <button onclick="saveItemChanges()" id="btnSave" class="apple-btn px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-blue to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2">
@@ -704,37 +661,37 @@
         <div class="absolute inset-0 modal-overlay" onclick="closeSettingsModal()"></div>
         <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative flex flex-col transform scale-95 transition-transform duration-300" id="settingsModalContent">
             
-            <div class="px-5 py-4 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <div class="px-5 py-4 border-b border-gray-200/50 flex justify-between items-center">
+                <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
                     <svg class="text-gray-500" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                     Ajustes de Cuenta
                 </h3>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             
-            <div class="px-5 py-6 bg-white/30 dark:bg-gray-900/30">
+            <div class="px-5 py-6 bg-white/30">
                 <div class="flex flex-col items-center justify-center mb-6">
                     <div id="settingsAvatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg mb-3">
                         U
                     </div>
-                    <p id="settingsName" class="font-bold text-gray-900 dark:text-white">Usuario</p>
-                    <p id="settingsEmail" class="text-xs text-gray-500 dark:text-gray-400">usuario@grupoimade.com</p>
+                    <p id="settingsName" class="font-bold text-gray-900">Usuario</p>
+                    <p id="settingsEmail" class="text-xs text-gray-500">usuario@grupoimade.com</p>
                 </div>
 
                 <div class="space-y-2 mb-6">
-                    <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
-                        <span class="text-sm font-medium dark:text-gray-300">Notificaciones de correo</span>
+                    <div class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-gray-100">
+                        <span class="text-sm font-medium">Notificaciones de correo</span>
                         <input type="checkbox" class="apple-checkbox" checked>
                     </div>
-                    <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
-                        <span class="text-sm font-medium dark:text-gray-300">Modo Demo (Pruebas)</span>
+                    <div class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-gray-100">
+                        <span class="text-sm font-medium">Modo Demo (Pruebas)</span>
                         <input type="checkbox" id="demoModeToggle" class="apple-checkbox" onchange="toggleDemoMode()">
                     </div>
                 </div>
 
-                <button onclick="openLogoutConfirmModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-red-200 dark:border-red-900/50 rounded-xl text-red-600 dark:text-red-400 bg-red-50/50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors shadow-sm font-semibold text-sm">
+                <button onclick="openLogoutConfirmModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-red-200 rounded-xl text-red-600 bg-red-50/50 hover:bg-red-100 transition-colors shadow-sm font-semibold text-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     Cerrar Sesión de Microsoft
                 </button>
@@ -747,13 +704,13 @@
         <div class="absolute inset-0 modal-overlay" onclick="closeLogoutConfirmModal()"></div>
         <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative text-center p-6 transform scale-95 transition-transform duration-300 border border-red-500/30" id="logoutConfirmContent">
             
-            <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center mx-auto mb-4 relative">
+            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 relative">
                 <div class="absolute inset-0 rounded-full animate-ping bg-red-400 opacity-20"></div>
-                <svg class="text-red-500 dark:text-red-400 relative z-10" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <svg class="text-red-500 relative z-10" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Cerrar sesión?</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Cerrar sesión?</h3>
+            <p class="text-sm text-gray-500 mb-6 leading-relaxed">
                 Desconectarás tu cuenta del Tenant de Microsoft. Perderás el acceso a la conexión API de SharePoint hasta que vuelvas a autenticarte.
             </p>
             
@@ -761,7 +718,7 @@
                 <button onclick="signOut()" class="apple-btn w-full px-4 py-3 text-sm font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 shadow-md shadow-red-500/20 transition-all">
                     Sí, Desconectar
                 </button>
-                <button onclick="closeLogoutConfirmModal()" class="apple-btn w-full px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <button onclick="closeLogoutConfirmModal()" class="apple-btn w-full px-4 py-3 text-sm font-semibold text-gray-700 bg-white/50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
                     Mantener Sesión
                 </button>
             </div>
@@ -777,9 +734,6 @@
          * CONFIGURACIÓN E INICIALIZACIÓN
          * ==========================================
          */
-        
-        // Configuración de Theme
-        let isDarkMode = localStorage.getItem('theme') === 'dark';
         
         // Estado Global de la App
         const state = {
@@ -814,7 +768,6 @@
 
         // Inicialización principal
         window.onload = async () => {
-            initTheme();
             setupEventListeners();
             
             try {
@@ -829,33 +782,24 @@
 
         /**
          * ==========================================
-         * TEMA Y UI UTILS
+         * UI UTILS
          * ==========================================
          */
-        function initTheme() {
-            if (isDarkMode || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.getElementById('themeIconDark').classList.add('hidden');
-                document.getElementById('themeIconLight').classList.remove('hidden');
-                isDarkMode = true;
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+
+        function showLoader() {
+            const loader = document.getElementById('globalLoader');
+            loader.classList.remove('hidden');
+            // Trigger reflow to ensure animation runs
+            void loader.offsetWidth;
+            loader.classList.remove('opacity-0');
         }
 
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                document.getElementById('themeIconDark').classList.add('hidden');
-                document.getElementById('themeIconLight').classList.remove('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                document.getElementById('themeIconLight').classList.add('hidden');
-                document.getElementById('themeIconDark').classList.remove('hidden');
-            }
+        function hideLoader() {
+            const loader = document.getElementById('globalLoader');
+            loader.classList.add('opacity-0');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 300);
         }
 
         function showToast(message, type = 'success', duration = 4000) {
@@ -863,9 +807,9 @@
             const toast = document.createElement('div');
             
             const colors = {
-                success: 'bg-white dark:bg-gray-800 border-green-500 border-l-4 text-gray-800 dark:text-white',
-                error: 'bg-white dark:bg-gray-800 border-red-500 border-l-4 text-gray-800 dark:text-white',
-                info: 'bg-white dark:bg-gray-800 border-blue-500 border-l-4 text-gray-800 dark:text-white'
+                success: 'bg-white border-green-500 border-l-4 text-gray-800',
+                error: 'bg-white border-red-500 border-l-4 text-gray-800',
+                info: 'bg-white border-blue-500 border-l-4 text-gray-800'
             };
 
             const icons = {
@@ -874,26 +818,27 @@
                 info: `<svg class="text-blue-500 shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
             };
 
-            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-floating ${colors[type]} transform translate-x-full transition-all duration-300 opacity-0 min-w-[300px] max-w-sm border border-gray-100 dark:border-gray-700 pointer-events-auto`;
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-floating ${colors[type]} transform translate-x-full transition-transform duration-300 opacity-0 min-w-[300px] max-w-sm border border-gray-100 pointer-events-auto`;
             toast.innerHTML = `
                 ${icons[type]}
                 <span class="text-sm font-medium flex-1 break-words">${message}</span>
-                <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onclick="this.parentElement.remove()">
+                <button class="text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             `;
             
             container.appendChild(toast);
             
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-full', 'opacity-0');
-            });
+            // Force browser reflow to ensure the translate-x-full is applied BEFORE transitioning
+            void toast.offsetWidth;
+            
+            // Start transition
+            toast.classList.remove('translate-x-full', 'opacity-0');
 
-            // Animate out and remove
+            // Remove after duration
             setTimeout(() => {
                 toast.classList.add('translate-x-full', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
+                setTimeout(() => toast.remove(), 300); // wait for exit animation
             }, duration);
         }
 
@@ -1136,14 +1081,16 @@
         }
 
         async function loadData(showToastMsg = false) {
+            showLoader();
+
             if(state.isDemoMode) {
-                if(showToastMsg) showToast("Datos sincronizados (Demo)", "success");
-                processData();
+                setTimeout(() => {
+                    processData();
+                    hideLoader();
+                    if(showToastMsg) showToast("Datos sincronizados (Demo)", "success");
+                }, 800); // Simulamos carga para que se vea el loader bonito
                 return;
             }
-
-            const refreshIcon = document.getElementById('refreshIcon');
-            refreshIcon.classList.add('animate-spin');
 
             try {
                 const accounts = msalInstance.getAllAccounts();
@@ -1181,7 +1128,7 @@
                 // Si falla (por ejemplo, porque las credenciales expiraron o no hay lista), activamos el demo.
                 if(state.items.length === 0) enableDemoMode();
             } finally {
-                refreshIcon.classList.remove('animate-spin');
+                hideLoader();
             }
         }
 
@@ -1291,17 +1238,17 @@
             if (paginatedItems.length === 0) {
                 tbody.innerHTML = `
                     <tr><td colspan="8" class="px-5 py-16 text-center">
-                        <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                        <div class="flex flex-col items-center justify-center text-gray-400">
                             <svg class="mb-4" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-                            <p class="text-lg font-medium text-gray-900 dark:text-white mb-1">Sin resultados</p>
-                            <p class="text-sm">No hay registros que coincidan con los filtros actuales.</p>
+                            <p class="text-lg font-medium text-gray-900 mb-1">Sin resultados</p>
+                            <p class="text-sm text-gray-500">No hay registros que coincidan con los filtros actuales.</p>
                         </div>
                     </td></tr>
                 `;
             } else {
                 paginatedItems.forEach((item, index) => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group relative';
+                    tr.className = 'hover:bg-gray-50/50 transition-colors group relative';
                     tr.style.animation = `fadeIn 0.3s ease-out forwards ${index * 0.05}s`;
                     tr.style.opacity = '0';
 
@@ -1313,41 +1260,41 @@
 
                     const attCount = item.AttachmentFiles ? item.AttachmentFiles.length : 0;
                     const attHtml = attCount > 0 
-                        ? `<div class="flex items-center justify-center"><span class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-lg text-xs font-medium border border-gray-200 dark:border-gray-600 shadow-sm"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${attCount}</span></div>`
-                        : `<span class="text-gray-300 dark:text-gray-600 text-center block">-</span>`;
+                        ? `<div class="flex items-center justify-center"><span class="flex items-center gap-1 bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-medium border border-gray-200 shadow-sm"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${attCount}</span></div>`
+                        : `<span class="text-gray-300 text-center block">-</span>`;
 
                     tr.innerHTML = `
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 text-center w-12">
+                        <td class="px-5 py-4 border-b border-gray-100 text-center w-12">
                             <input type="checkbox" class="apple-checkbox row-checkbox" value="${item.Id}" onchange="updateBulkActions()">
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-sm text-gray-500 font-mono">
                             #${item.Id}
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900 dark:text-gray-200">${fechaStr}</div>
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${fechaStr}</div>
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
-                            <div class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-gray-900 flex items-center gap-2">
                                 <svg class="text-gray-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                                 ${item._parsedSucursal}
                             </div>
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
                             <div class="flex items-center gap-3">
                                 <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm" style="background-color: ${avatarColor}">
                                     ${initials}
                                 </div>
-                                <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">${item._parsedUsuario}</span>
+                                <span class="text-sm text-gray-700 font-medium">${item._parsedUsuario}</span>
                             </div>
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap">
                             ${attHtml}
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap text-center">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-center">
                             ${renderStatusBadge(item._parsedEstado)}
                         </td>
-                        <td class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 whitespace-nowrap text-right">
-                            <button onclick="openModal(${item.Id}, '${item._listName}')" class="apple-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-brand-blue hover:text-white dark:hover:bg-brand-blue transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Ver detalle">
+                        <td class="px-5 py-4 border-b border-gray-100 whitespace-nowrap text-right">
+                            <button onclick="openModal(${item.Id}, '${item._listName}')" class="apple-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-brand-blue hover:text-white transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50" title="Ver detalle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </button>
                         </td>
@@ -1362,10 +1309,10 @@
 
         function renderStatusBadge(estado) {
             const e = estado.toLowerCase();
-            if(e.includes('finalizado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-800">Aprobado</span>`;
-            if(e.includes('espera')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800"><span class="animate-pulse mr-1">●</span> Pendiente</span>`;
-            if(e.includes('rechazado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-800">Rechazado</span>`;
-            return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${estado || 'N/A'}</span>`;
+            if(e.includes('finalizado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-green-100 text-green-700 border border-green-200">Aprobado</span>`;
+            if(e.includes('espera')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-yellow-100 text-yellow-700 border border-yellow-200"><span class="animate-pulse mr-1">●</span> Pendiente</span>`;
+            if(e.includes('rechazado')) return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-red-100 text-red-700 border border-red-200">Rechazado</span>`;
+            return `<span class="px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 border border-gray-200">${estado || 'N/A'}</span>`;
         }
 
         function getAvatarColor(name) {
@@ -1382,7 +1329,7 @@
             const start = total === 0 ? 0 : (state.page - 1) * state.itemsPerPage + 1;
             const end = Math.min(start + state.itemsPerPage - 1, total);
             
-            document.getElementById('paginationInfo').innerHTML = `Mostrando <span class="font-bold text-gray-900 dark:text-white">${start}</span> a <span class="font-bold text-gray-900 dark:text-white">${end}</span> de <span class="font-bold text-gray-900 dark:text-white">${total}</span> registros`;
+            document.getElementById('paginationInfo').innerHTML = `Mostrando <span class="font-bold text-gray-900">${start}</span> a <span class="font-bold text-gray-900">${end}</span> de <span class="font-bold text-gray-900">${total}</span> registros`;
             
             document.getElementById('btnPrevPage').disabled = state.page === 1;
             document.getElementById('btnNextPage').disabled = state.page === maxPage;
@@ -1403,7 +1350,7 @@
                 }
                 
                 const btn = document.createElement('button');
-                btn.className = `apple-btn w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${i === state.page ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/30' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`;
+                btn.className = `apple-btn w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${i === state.page ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/30' : 'text-gray-600 hover:bg-gray-200'}`;
                 btn.innerText = i;
                 btn.onclick = () => { state.page = i; renderTable(); };
                 pageNumbersDiv.appendChild(btn);
@@ -1450,13 +1397,13 @@
             
             // UI Update tabs
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'dark:bg-gray-700', 'text-gray-900', 'dark:text-white', 'shadow-sm', 'active');
-                btn.classList.add('text-gray-500', 'dark:text-gray-400');
+                btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm', 'active');
+                btn.classList.add('text-gray-500');
             });
             
             const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
-            activeBtn.classList.add('bg-white', 'dark:bg-gray-700', 'text-gray-900', 'dark:text-white', 'shadow-sm', 'active');
+            activeBtn.classList.remove('text-gray-500');
+            activeBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm', 'active');
             
             processData();
         }
@@ -1585,18 +1532,18 @@
                     const attachUrl = state.isDemoMode ? '#' : `${baseDomainUrl}${file.ServerRelativeUrl}`;
                     
                     adjuntosContainer.innerHTML += `
-                        <a href="${attachUrl}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <a href="${attachUrl}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-200/50 hover:bg-gray-100 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             </div>
-                            <span class="text-sm font-medium text-brand-blue dark:text-blue-400 group-hover:underline truncate flex-1">${file.FileName}</span>
+                            <span class="text-sm font-medium text-brand-blue group-hover:underline truncate flex-1">${file.FileName}</span>
                             <svg class="text-gray-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                         </a>
                     `;
                 });
             } else {
                 adjuntosContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 p-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50/30 dark:bg-gray-800/30 justify-center">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50/30 justify-center">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         No se adjuntaron archivos
                     </div>
