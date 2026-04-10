@@ -3,79 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Grupo Imade</title>
+    <title>Ingresar - Grupo Imade</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración de colores (Misma que tu proyecto principal) -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: { 
-                    colors: { brand: { dark: '#2A3C84', light: '#41A8DC', bg: '#F4F7F9' } }, 
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], } 
-                }
-            }
-        }
-    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { background-color: #F8FAFC; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Tipografía moderna y limpia para interfaces minimalistas */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Fondo gris ultra claro (slate-50) */
+        }
+
+        /* Animación fluida y sutil de entrada */
+        .fade-in-up { 
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="font-sans text-gray-800 antialiased min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 antialiased text-slate-800">
 
-    <div class="bg-white max-w-md w-full rounded-2xl shadow-xl overflow-hidden fade-in border border-gray-100">
-        <div class="bg-gray-50 px-8 pt-8 pb-6 text-center border-b border-gray-100">
-            <!-- Espacio para el Logo -->
-            <img src="logo.png" alt="Grupo Imade" class="h-12 mx-auto mb-4 object-contain" onerror="this.src='https://via.placeholder.com/150x50?text=Grupo+Imade'">
-            <h2 class="text-2xl font-bold text-brand-dark">Bienvenido de nuevo</h2>
-            <p class="text-sm text-gray-500 mt-2">Ingresa tus credenciales para acceder al sistema.</p>
+    <div class="w-full max-w-[400px] fade-in-up">
+        
+        <!-- Encabezado / Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-block p-4 bg-white rounded-2xl shadow-sm mb-4 border border-slate-100">
+                <img src="logo.png" alt="" class="h-10 object-contain" onerror="this.outerHTML='<span class=\'text-[#2A3C84] text-xl font-bold\'>GRUPO IMADE</span>'">
+            </div>
+            <h1 class="text-2xl font-semibold tracking-tight text-[#2A3C84]">Bienvenido</h1>
+            <p class="text-sm text-slate-500 mt-2">Ingresa tus credenciales para continuar</p>
         </div>
 
-        <div class="p-8">
-            <form id="loginForm" class="space-y-5">
+        <!-- Tarjeta de Formulario Minimalista -->
+        <div class="bg-white p-8 rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-100/50">
+            
+            <form id="loginForm" class="flex flex-col gap-5">
+                
+                <!-- Usuario -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                    <input type="email" id="email" name="email" required 
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-light focus:border-brand-light outline-none transition-all"
-                        placeholder="tu@correo.com">
+                    <label for="usuario" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Usuario</label>
+                    <input type="text" id="usuario" name="usuario" required 
+                        class="w-full px-4 py-3.5 bg-slate-50 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#41A8DC] focus:ring-4 focus:ring-[#41A8DC]/10 transition-all outline-none placeholder-slate-400"
+                        placeholder="Escribe tu usuario">
                 </div>
 
+                <!-- Contraseña -->
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                    <label for="password" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Contraseña</label>
                     <input type="password" id="password" name="password" required 
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-light focus:border-brand-light outline-none transition-all"
+                        class="w-full px-4 py-3.5 bg-slate-50 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#41A8DC] focus:ring-4 focus:ring-[#41A8DC]/10 transition-all outline-none placeholder-slate-400"
                         placeholder="••••••••">
                 </div>
 
-                <!-- Mensaje de Error (Oculto por defecto) -->
-                <div id="errorMessage" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-lg flex items-start gap-2">
-                    <svg class="mt-0.5 shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <!-- Mensaje de Error (Sin colores estridentes, acorde al minimalismo) -->
+                <div id="errorMessage" class="hidden bg-slate-50 border border-slate-200 text-[#2A3C84] font-medium text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2">
+                    <svg class="shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     <span id="errorText">Credenciales incorrectas.</span>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-brand-dark text-white font-medium rounded-lg px-4 py-3 hover:bg-blue-800 transition-colors flex items-center justify-center gap-2 mt-4 shadow-md">
-                    <span id="btnText">Iniciar Sesión</span>
-                    <svg id="btnSpinner" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <!-- Botón de Ingresar -->
+                <button type="submit" id="submitBtn" class="w-full mt-2 bg-[#2A3C84] hover:bg-[#1e2b5e] text-white font-medium py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-[#2A3C84]/25 hover:shadow-[#2A3C84]/40 active:scale-[0.98]">
+                    <span id="btnText">Ingresar al sistema</span>
+                    <svg id="btnSpinner" class="animate-spin h-5 w-5 hidden text-white/70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </button>
+                
             </form>
         </div>
-        
-        <div class="bg-gray-50 px-8 py-4 border-t border-gray-100 text-center">
-            <p class="text-xs text-gray-500">Gestión de Cierres © Grupo Imade</p>
+
+        <!-- Pie de página simple -->
+        <div class="text-center mt-8">
+            <p class="text-xs text-slate-400">© 2024 Grupo Imade. Todos los derechos reservados.</p>
         </div>
+
     </div>
 
     <script>
-        // URL de tu implementación de Google Apps Script
+        // URL de tu API de Google Apps Script
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpBJVHxJPqhM1EJumVrcvKfu0nvg3FsQWQbhqqn_N5kTL3bMFqB3q_SAZV3hBpdR8UQw/exec';
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const usuario = document.getElementById('usuario').value;
             const password = document.getElementById('password').value;
             
             const btnText = document.getElementById('btnText');
@@ -86,25 +100,25 @@
 
             // Estado de carga
             submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
-            btnText.innerText = "Verificando...";
+            submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
+            btnText.innerText = "Autenticando...";
             btnSpinner.classList.remove('hidden');
             errorMessage.classList.add('hidden');
 
             try {
-                // Hacer la petición al Google Apps Script
+                // Petición a Google Sheets
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ email: email, password: password })
+                    body: JSON.stringify({ usuario: usuario, password: password })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    // Login exitoso
-                    btnText.innerText = "¡Conectado!";
+                    // Acceso concedido
+                    btnText.innerText = "Acceso exitoso";
                     
-                    // Guardamos la sesión en el navegador (opcional)
+                    // Guardar sesión
                     sessionStorage.setItem('usuarioAcreditado', result.user);
                     
                     // Redirigir a inicio.html
@@ -113,21 +127,21 @@
                     }, 500);
 
                 } else {
-                    // Mostrar error retornado por Google Apps Script
-                    errorText.innerText = result.message;
+                    // Mostrar error
+                    errorText.innerText = result.message || "Usuario o contraseña incorrectos.";
                     errorMessage.classList.remove('hidden');
                 }
 
             } catch (error) {
                 console.error("Error en login:", error);
-                errorText.innerText = "Error de conexión con el servidor. Verifica la URL de Google Script.";
+                errorText.innerText = "Error al conectar con el servidor.";
                 errorMessage.classList.remove('hidden');
             } finally {
-                // Restaurar botón
+                // Restaurar botón si hay error
                 if(errorMessage.classList.contains('hidden') === false) {
                     submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-                    btnText.innerText = "Iniciar Sesión";
+                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
+                    btnText.innerText = "Ingresar al sistema";
                     btnSpinner.classList.add('hidden');
                 }
             }
