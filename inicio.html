@@ -1,28 +1,77 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal ERP - Grupo Imade</title>
-    <!-- Importamos Tailwind CSS -->
+    <title>Portal ERP - Grupo Imade | Apple Design</title>
+    
+    <!-- Fuentes de Apple (San Francisco) fallback a Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Configuración de colores ERP -->
+    <!-- MSAL.js para Autenticación con Microsoft 365 -->
+    <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
+    
+    <!-- Configuración Tailwind adaptada a Apple HIG -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: [
+                            '-apple-system', 
+                            'BlinkMacSystemFont', 
+                            '"SF Pro Display"',
+                            '"SF Pro Text"',
+                            '"Helvetica Neue"', 
+                            'Helvetica', 
+                            'Arial', 
+                            'sans-serif'
+                        ],
+                    },
                     colors: {
-                        brand: {
-                            dark: '#1e293b',   /* Slate 800 - Estilo más sobrio para ERP */
-                            primary: '#2A3C84', /* Azul Imade */
-                            light: '#41A8DC',  /* Celeste Imade */
-                            accent: '#38bdf8',
-                            bg: '#f8fafc'      /* Slate 50 */
+                        apple: {
+                            bg: '#F5F5F7',
+                            card: '#FFFFFF',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            blue: '#007AFF',
+                            blueHover: '#0066CC',
+                            blueLight: '#E5F0FF',
+                            green: '#34C759',
+                            purple: '#AF52DE',
+                            orange: '#FF9500',
+                            border: '#E5E5EA',
                         }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    boxShadow: {
+                        'apple-soft': '0 4px 24px rgba(0, 0, 0, 0.04)',
+                        'apple-floating': '0 10px 40px rgba(0, 0, 0, 0.08)',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
                     }
                 }
             }
@@ -30,93 +79,366 @@
     </script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        /* Ocultar barra de desplazamiento pero permitir scroll */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Estilos CSS Base Apple */
+        body {
+            background-color: #F5F5F7;
+            color: #1D1D1F;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: all 0.3s ease;
+        }
+
+        /* Fondo dinámico */
+        .apple-bg-fx {
+            background-image: 
+                radial-gradient(at 40% 20%, hsla(210,100%,90%,1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(189,100%,90%,1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(280,100%,90%,1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Sidebar Glassmorphism */
+        .apple-sidebar {
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: saturate(200%) blur(30px);
+            -webkit-backdrop-filter: saturate(200%) blur(30px);
+        }
+
+        /* Header Glassmorphism */
+        .apple-header {
+            background-color: rgba(245, 245, 247, 0.75);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+        }
+
+        /* Efectos de click estilo iOS */
+        .apple-active:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+
+        /* Tarjetas de Módulos (Widgets) */
+        .apple-widget {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .apple-widget:hover {
+            transform: scale(1.02) translateY(-4px);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.06);
+        }
+
+        /* Scrollbars minimalistas */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+
+        /* Checkbox Custom Apple */
+        .apple-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #C7C7CC;
+            border-radius: 6px;
+            background-color: transparent;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .apple-checkbox:checked {
+            background-color: #007AFF;
+            border-color: #007AFF;
+        }
+        .apple-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
     </style>
 </head>
-<body class="bg-brand-bg text-slate-800 font-sans h-screen flex overflow-hidden antialiased">
+<body id="mainBody" class="apple-bg-fx text-apple-text h-screen flex overflow-hidden selection:bg-apple-blue selection:text-white relative">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <!-- En móvil se oculta por defecto, en PC es fija -->
-    <aside id="sidebar" class="bg-brand-dark w-64 flex-shrink-0 flex flex-col h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 absolute md:relative z-50">
+    <!-- Elementos Decorativos de Fondo (Blobs) -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-teal-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Contenedor de Notificaciones (Toasts) iOS Style -->
+    <div id="toastContainer" class="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none items-center w-full max-w-sm"></div>
+
+    <!-- BARRA LATERAL (SIDEBAR MAC STYLE) -->
+    <aside id="sidebar" class="apple-sidebar w-[260px] flex-shrink-0 flex flex-col h-full border-r border-apple-border/60 transform -translate-x-full md:translate-x-0 transition-transform duration-300 absolute md:relative z-50">
         
-        <!-- Logo Area -->
-        <div class="h-16 flex items-center justify-center bg-white px-4 border-b border-slate-200">
-            <img src="logo.png" alt="Grupo Imade Logo" class="max-h-10 object-contain"
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150x40?text=Grupo+Imade';">
+        <!-- Header del Sidebar -->
+        <div class="h-16 flex items-center px-6 mt-2">
+            <div class="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                I
+            </div>
+            <div class="flex flex-col justify-center ml-3">
+                <h1 class="text-[15px] font-bold tracking-tight leading-none text-apple-text">Grupo Imade</h1>
+                <span class="text-[11px] text-apple-textMuted font-medium mt-0.5">Portal Corporativo</span>
+            </div>
         </div>
 
         <!-- Menú de Navegación -->
         <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-4">Principal</p>
             
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-brand-primary text-white rounded-lg group font-medium text-sm">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Dashboard
+            <p class="px-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-2 mt-2">Principal</p>
+            
+            <!-- Item Activo -->
+            <a href="#" class="flex items-center gap-3 px-3 py-2 bg-white/60 text-apple-text rounded-xl font-semibold text-[14px] shadow-sm border border-white/40">
+                <div class="w-7 h-7 rounded-md bg-apple-blue text-white flex items-center justify-center shadow-sm">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                </div>
+                Inicio
             </a>
 
-            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">Módulos Operativos</p>
+            <p class="px-3 text-[11px] font-semibold text-apple-textMuted uppercase tracking-wider mb-2 mt-6">Módulos Operativos</p>
             
-            <a href="cierres.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg group font-medium text-sm transition-colors">
-                <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Contabilidad: Cierres
+            <!-- Item Normal -->
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2 text-apple-text hover:bg-black/5 rounded-xl font-medium text-[14px] transition-colors group apple-active">
+                <div class="w-7 h-7 rounded-md bg-white text-apple-green flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                Gestión de Cierres
             </a>
             
-            <a href="codigo.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg group font-medium text-sm transition-colors">
-                <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <a href="codigo.html" class="flex items-center gap-3 px-3 py-2 text-apple-text hover:bg-black/5 rounded-xl font-medium text-[14px] transition-colors group apple-active">
+                <div class="w-7 h-7 rounded-md bg-white text-apple-purple flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                </div>
                 Creación de Códigos
             </a>
+            
+            <!-- Placeholder -->
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-apple-text hover:bg-black/5 rounded-xl font-medium text-[14px] transition-colors group apple-active">
+                <div class="w-7 h-7 rounded-md bg-white text-apple-orange flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                </div>
+                Inventario
+            </a>
         </nav>
+        
+        <!-- Bottom Sidebar (Usuario) -->
+        <div class="p-4 border-t border-apple-border/50">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer apple-active" onclick="openSettingsModal()">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                    U
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[13px] font-semibold text-apple-text leading-none mb-1">Mi Cuenta</span>
+                    <span class="text-[11px] text-apple-textMuted leading-none">Ajustes y Seguridad</span>
+                </div>
+            </div>
+        </div>
     </aside>
 
     <!-- Overlay oscuro para móvil al abrir sidebar -->
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <!-- ÁREA PRINCIPAL -->
-    <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative z-10">
         
         <!-- BARRA SUPERIOR (HEADER) -->
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 flex-shrink-0 z-30">
+        <header class="h-16 apple-header border-b border-apple-border/50 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 z-30">
             <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-500 hover:text-slate-700 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                <button onclick="toggleSidebar()" class="md:hidden text-apple-text hover:opacity-70 focus:outline-none apple-active">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>
                 </button>
-                <div class="hidden sm:flex items-center text-sm text-slate-500 font-medium">
-                    <span class="text-slate-400">Grupo Imade</span>
-                    <svg class="w-4 h-4 mx-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                    <span class="text-brand-primary font-semibold">Dashboard Principal</span>
+                <div class="hidden sm:flex items-center text-[13px] font-medium">
+                    <span class="text-apple-textMuted">Portal ERP</span>
+                    <svg class="w-3.5 h-3.5 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    <span class="text-apple-text font-semibold">Inicio</span>
                 </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="openSettingsModal()" class="apple-active w-8 h-8 rounded-full bg-white/60 border border-gray-200 flex items-center justify-center text-apple-text shadow-sm hover:bg-white transition-colors" title="Ajustes">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
             </div>
         </header>
 
         <!-- CONTENIDO DEL DASHBOARD -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-brand-bg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto relative">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-8 py-10">
                 
-                <!-- Encabezado de la página -->
-                <div class="mb-8">
-                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Centro de Operaciones</h1>
-                    <p class="text-sm text-slate-500 mt-1">Gestión centralizada del sistema ERP. Selecciona un módulo en el menú lateral para comenzar.</p>
+                <!-- Encabezado de la página (Hero) -->
+                <div class="mb-10 animate-slide-up">
+                    <h2 class="text-[40px] font-bold tracking-tight text-apple-text leading-none mb-2">Centro de Operaciones</h2>
+                    <p class="text-[17px] text-apple-textMuted font-medium">Gestión centralizada. Selecciona un módulo para acceder a tus herramientas corporativas.</p>
                 </div>
 
-                <!-- Espacio en blanco a petición -->
+                <!-- Grid de Módulos (Estilo App Icons / Widgets) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
+                    
+                    <!-- Módulo: Cierres Contables -->
+                    <a href="index.html" class="apple-widget block bg-white/80 backdrop-blur-xl border border-white rounded-[28px] p-6 shadow-apple-soft group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-apple-blue flex items-center justify-center text-white mb-5 shadow-sm">
+                                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="text-[20px] font-semibold text-apple-text tracking-tight mb-2 group-hover:text-apple-blue transition-colors">Cierres Contables</h3>
+                            <p class="text-[14px] text-apple-textMuted leading-relaxed">
+                                Supervisa, aprueba o rechaza los cierres contables emitidos por las sucursales en tiempo real.
+                            </p>
+                        </div>
+                    </a>
+
+                    <!-- Módulo: Creación de Códigos -->
+                    <a href="codigo.html" class="apple-widget block bg-white/80 backdrop-blur-xl border border-white rounded-[28px] p-6 shadow-apple-soft group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 to-apple-purple flex items-center justify-center text-white mb-5 shadow-sm">
+                                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            </div>
+                            <h3 class="text-[20px] font-semibold text-apple-text tracking-tight mb-2 group-hover:text-apple-purple transition-colors">Creación Códigos</h3>
+                            <p class="text-[14px] text-apple-textMuted leading-relaxed">
+                                Herramienta para la generación automatizada de nuevos códigos de producto y su correcta catalogación.
+                            </p>
+                        </div>
+                    </a>
+
+                    <!-- Módulo: Inventario (Placeholder) -->
+                    <div class="apple-widget block bg-white/40 backdrop-blur-xl border border-white rounded-[28px] p-6 shadow-apple-soft group relative overflow-hidden cursor-not-allowed opacity-80">
+                        <div class="absolute inset-0 bg-gray-50/50 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[28px]">
+                            <span class="bg-gray-800 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Próximamente</span>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-300 to-apple-orange flex items-center justify-center text-white mb-5 shadow-sm grayscale opacity-50">
+                                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                            </div>
+                            <h3 class="text-[20px] font-semibold text-gray-500 tracking-tight mb-2">Inventarios</h3>
+                            <p class="text-[14px] text-gray-400 leading-relaxed">
+                                Gestión de existencias, traslados entre sucursales y auditoría integral de bodegas corporativas.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
                 
-                <div class="mt-12 pt-6 border-t border-slate-200 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500">
+                <!-- Footer Integrado -->
+                <div class="mt-16 pt-8 border-t border-apple-border/50 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] font-medium text-apple-textMuted animate-slide-up" style="animation-delay: 0.2s;">
                     <p>&copy; <script>document.write(new Date().getFullYear())</script> Grupo Imade. Todos los derechos reservados.</p>
-                    <p class="mt-2 sm:mt-0 flex items-center gap-1 font-medium text-slate-400">
-                        <svg class="w-4 h-4 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <p class="flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full border border-gray-200/50 shadow-sm">
+                        <svg class="w-4 h-4 text-apple-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                         Desarrollado por IT Imade
                     </p>
                 </div>
+
             </div>
         </main>
     </div>
 
-    <!-- Script simple para abrir/cerrar sidebar en móviles -->
+    <!-- MODAL DE AJUSTES PROFESIONALES -->
+    <div id="settingsModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
+        <div class="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-apple-floating w-full max-w-[420px] overflow-hidden relative flex flex-col transform scale-95 transition-transform duration-300 border border-gray-200/50" id="settingsModalContent">
+            
+            <!-- Header Modal -->
+            <div class="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center bg-white/50 sticky top-0 z-10">
+                <h3 class="text-[17px] font-semibold tracking-tight text-apple-text flex items-center gap-2">
+                    Ajustes de Cuenta
+                </h3>
+                <button onclick="closeSettingsModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <!-- Contenido Modal -->
+            <div class="px-6 py-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+                
+                <!-- Perfil -->
+                <div class="flex flex-col items-center justify-center mb-6">
+                    <div id="settingsAvatar" class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-3xl shadow-sm mb-3">
+                        U
+                    </div>
+                    <p class="font-bold text-[19px] tracking-tight text-apple-text">Usuario Imade</p>
+                    <p class="text-[13px] text-apple-textMuted font-medium">usuario@grupoimade.com</p>
+                    <span class="mt-2 bg-gray-100 text-gray-600 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-gray-200">
+                        Departamento Contable
+                    </span>
+                </div>
+
+                <!-- Sección: Preferencias -->
+                <p class="text-[11px] font-bold text-apple-textMuted uppercase tracking-wider mb-2">Preferencias del Sistema</p>
+                <div class="bg-white rounded-2xl p-1 mb-6 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between p-3 border-b border-gray-100">
+                        <span class="text-[14px] font-medium text-apple-text flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-blue-50 text-apple-blue flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            Notificaciones por Correo
+                        </span>
+                        <input type="checkbox" class="apple-checkbox" checked>
+                    </div>
+                    <div class="flex items-center justify-between p-3 border-b border-gray-100">
+                        <span class="text-[14px] font-medium text-apple-text flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-orange-50 text-apple-orange flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            </div>
+                            Alertas del ERP
+                        </span>
+                        <input type="checkbox" class="apple-checkbox" checked>
+                    </div>
+                    <div class="flex items-center justify-between p-3">
+                        <span class="text-[14px] font-medium text-apple-text flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-purple-50 text-apple-purple flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            </div>
+                            Modo Pruebas (Demo)
+                        </span>
+                        <input type="checkbox" id="demoModeToggle" class="apple-checkbox" onchange="toggleDemoMode()">
+                    </div>
+                </div>
+
+                <!-- Sección: Seguridad -->
+                <p class="text-[11px] font-bold text-apple-textMuted uppercase tracking-wider mb-2">Seguridad</p>
+                <div class="bg-white rounded-2xl p-1 mb-6 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between p-3 border-b border-gray-100">
+                        <span class="text-[14px] font-medium text-apple-text flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-green-50 text-apple-green flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            </div>
+                            Autenticación (MFA)
+                        </span>
+                        <span class="text-[11px] bg-apple-greenLight text-apple-green border border-green-200 px-2 py-0.5 rounded-md font-semibold">
+                            Habilitada
+                        </span>
+                    </div>
+                    <button class="w-full flex items-center justify-between p-3 text-[14px] font-medium hover:bg-gray-50 transition-colors rounded-xl text-left apple-active">
+                        <span class="flex items-center gap-3 text-apple-text">
+                            <div class="w-6 h-6 rounded-md bg-gray-100 text-gray-500 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            Sesiones Activas
+                        </span>
+                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+
+                <!-- Cerrar Sesión -->
+                <button onclick="openLogoutConfirmModal()" class="apple-active w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-apple-red bg-apple-redLight border border-red-100 hover:bg-red-100 transition-colors font-semibold text-[15px] shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Cerrar Sesión Segura
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Lógica y Sidebar -->
     <script>
+        // --- Sidebar Mobile ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -125,10 +447,83 @@
             
             if(sidebar.classList.contains('-translate-x-full')) {
                 overlay.classList.add('hidden');
+                setTimeout(() => { overlay.classList.remove('opacity-100'); }, 10);
             } else {
                 overlay.classList.remove('hidden');
+                setTimeout(() => { overlay.classList.add('opacity-100'); }, 10);
             }
         }
+
+        // --- Modals Profesionales ---
+        function openSettingsModal() {
+            const m = document.getElementById('settingsModal'), c = document.getElementById('settingsModalContent');
+            m.classList.remove('hidden');
+            void m.offsetWidth; // Forzar reflow para animación
+            m.classList.remove('opacity-0');
+            c.classList.remove('scale-95');
+            c.classList.add('scale-100');
+        }
+
+        function closeSettingsModal() {
+            const m = document.getElementById('settingsModal'), c = document.getElementById('settingsModalContent');
+            m.classList.add('opacity-0');
+            c.classList.remove('scale-100');
+            c.classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 300);
+        }
+
+        // --- Toasts de sistema ---
+        function showToast(message, type = 'success', duration = 3500) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const icons = {
+                error: `<svg class="text-white bg-apple-red rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+                success: `<svg class="text-white bg-apple-green rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+                info: `<svg class="text-white bg-apple-blue rounded-full p-1 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+            };
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-full shadow-apple-floating bg-white/90 backdrop-blur-xl border border-gray-100 transform -translate-y-full opacity-0 transition-all duration-400 ease-out z-[9999]`;
+            toast.innerHTML = `
+                ${icons[type] || icons.success}
+                <span class="text-[14px] font-medium text-apple-text tracking-tight pr-2">${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            void toast.offsetWidth; // Force reflow
+            
+            toast.classList.remove('-translate-y-full', 'opacity-0');
+            toast.classList.add('translate-y-4', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-100');
+                toast.classList.add('-translate-y-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 400); 
+            }, duration);
+        }
+
+        // --- Lógica del Modo Demo ---
+        function toggleDemoMode() {
+            const isChecked = document.getElementById('demoModeToggle').checked;
+            if(isChecked) {
+                showToast("Modo Demostración Activado", "info");
+            } else {
+                showToast("Recargando entorno de producción...", "info", 2000);
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+
+        // Placeholder para Cerrar Sesión (Si se quisiera implementar el modal de confirmación)
+        function openLogoutConfirmModal() {
+            // Cierra settings si está abierto
+            closeSettingsModal();
+            // Lógica de logout (Placeholder simulado)
+            showToast("Cerrando sesión en Microsoft 365...", "info");
+            setTimeout(() => {
+                alert("Sesión finalizada. (Redirigiendo a Login)");
+            }, 1000);
+        }
+
     </script>
 </body>
 </html>
